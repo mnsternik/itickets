@@ -30,7 +30,7 @@ const ResponsesList = (props) => {
             key={response.id}
             resId={response.id}
             resAuthor={response.author}
-            date={response.date}
+            createDate={response.createDate}
             message={response.message}
             visibility={response.visibility}
             taskAuthor={taskData.author}

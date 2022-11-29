@@ -3,14 +3,15 @@ import { useSelector } from 'react-redux';
 import useHttp from '../../../hooks/useHttp';
 import { fetchTasksData } from '../../../store/tasks';
 
-import { getDatabase, ref, set, child, push } from 'firebase/database';
+import { writeResponseData } from '../../../lib/api';
+
+//import { ref, set, child, push } from 'firebase/database';
+//import { db } from '../../../util/firebase';
 
 import { Button, Box, TextField, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 //import SelectInput from '../../../UI/SelectInput';
 
 const NewResponse = (props) => {
-
-    //const db = getDatabase();
 
     const [responseInputValue, setResponseInputValue] = useState('');
     const [isResponsePrivate, setIsResponsePrivate] = useState('Public');
@@ -28,18 +29,6 @@ const NewResponse = (props) => {
     });
 
 
-
-    /*
-       function addResponseHandler(resId, taskId, author, createDate, message, visibility) {
-           set(ref(db, '/responses' + resId), {
-               taskId: taskId,
-               author: author,
-               createDate: createDate,
-               message: message,
-               visibility: visibility
-           })
-       };*/
-
     const isResPrivateChangeHandler = (event) => {
         setIsResponsePrivate(event.target.value);
     };
@@ -52,15 +41,11 @@ const NewResponse = (props) => {
         let updatedTask = structuredClone(props.taskData);
         const taskUrl = `https://iticket-fd059-default-rtdb.firebaseio.com/tasks/${updatedTask.firebaseKey}.json`;
 
-        //const newPostKey = push(child(ref(db), 'tasks')).key
-
-        //console.log(newPostKey)
-
         const responseData = {
             id: Math.floor(Math.random() * 1000).toString(),
             taskId: updatedTask.id,
             author: username,
-            date: dateFormatter.format(new Date()),
+            createDate: dateFormatter.format(new Date()),
             message: responseInputValue,
             visibility: isResponsePrivate
         };
@@ -72,6 +57,8 @@ const NewResponse = (props) => {
         }
 
         updatedTask.modificationDate = dateFormatter.format(new Date());
+
+        //writeResponseData(updatedTask.id, responseData);
 
         sendUpdatedTask({
             url: taskUrl,

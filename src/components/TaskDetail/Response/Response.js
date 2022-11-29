@@ -11,7 +11,7 @@ const Response = (props) => {
         taskAuthor,
         resId,
         taskId,
-        date: createResDate,
+        createDate,
         visibility,
         message
     } = props;
@@ -36,7 +36,7 @@ const Response = (props) => {
 
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                    <Typography variant='subtitle2' sx={{ fontWeight: 'light', mb: 2 }}> {resAuthor}, {createResDate} </Typography>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 'light', mb: 2 }}> {resAuthor}, {createDate} </Typography>
                     <Typography variant='subtitle2' sx={{ fontWeight: 'bold', mb: 2, pl: 2 }}> {visibility} </Typography>
 
                 </Box>
