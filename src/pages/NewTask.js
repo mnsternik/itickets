@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { readNewTaskId, writeNewTaskData } from '../lib/api';
+import { readCategoriesData, readNewTaskId, writeNewTaskData } from '../lib/api';
 
 import NewTaskForm from '../components/NewTask/NewTaskForm';
 
@@ -14,12 +14,16 @@ const NewTask = () => {
     const [categoryInputValue, setCategoryInputValue] = useState('');
 
     const user = useSelector(state => state.auth.username);
-    const categories = useSelector(state => state.tasks.categoriesData.categories);
+    //const categories = useSelector(state => state.tasks.categoriesData.categories);
 
     const [newTaskId, setNewTaskId] = useState('');
+    const [categories, setCategories] = useState([]);
+
+    // /const transformedCategories = categories.map(category => category.name);
 
     useEffect(() => {
         readNewTaskId(setNewTaskId);
+        readCategoriesData(setCategories);
     }, [])
 
     const dateFormatter = new Intl.DateTimeFormat('en', {

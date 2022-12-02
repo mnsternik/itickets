@@ -1,28 +1,28 @@
-import { deleteGroup } from '../../../lib/api';
+import { deleteCategory } from '../../../lib/api';
 
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 
 const DataList = (props) => {
 
-    const { groupsData } = props;
+    const { categoriesData } = props;
 
-    const deleteGroupHandler = (groupId) => {
-        deleteGroup(groupId)
+    const deleteCategoryHandler = (categoryId) => {
+        deleteCategory(categoryId)
     };
 
-    let groupsList;
-    if (groupsData.length) {
-        groupsList = groupsData.map(group => (
-            <TableRow key={group.name}>
+    let categoriesList;
+    if (categoriesData.length) {
+        categoriesList = categoriesData.map(category => (
+            <TableRow key={category.id}>
                 <TableCell component="th" scope="row">
-                    {group.name}
+                    {category.name}
                 </TableCell>
                 <TableCell align="center">
-                    {group.members ? group.members.length : 0}
+                    {category.tasksAssigned ? category.tasksAssigned.length : 0}
                 </TableCell>
                 <TableCell align="right">
-                    {<Button onClick={() => deleteGroupHandler(group.id)}>Delete</Button>}
+                    {<Button onClick={() => deleteCategoryHandler(category.id)}>Delete</Button>}
                 </TableCell>
             </TableRow>
         ))
@@ -34,13 +34,13 @@ const DataList = (props) => {
                 <TableHead>
                     <TableRow >
                         <TableCell sx={{ color: 'text.secondary' }}>Name</TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }} align="center">Members</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }} align="center">Tasks assigned</TableCell>
                         <TableCell sx={{ color: 'text.secondary' }} align="right">Action</TableCell>
 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {groupsList}
+                    {categoriesList}
                 </TableBody>
             </Table>
         </TableContainer>

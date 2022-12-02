@@ -1,14 +1,19 @@
-import { useSelector } from 'react-redux';
-import { fetchCategoriesData } from '../store/tasks';
+import { useEffect, useState } from 'react';
+import { readCategoriesData } from '../lib/api';
 
-import ManagableStringDataList from '../UI/ManagableStringDataList';
+import DataList from '../components/ManageData/Categories/DataList';
+import NewGroup from '../components/ManageData/Categories/NewCategory';
 
 import { Paper, Divider, Typography } from '@mui/material';
 
 
-const ManageCategories = () => {
+const ManageCategoriesData = () => {
 
-    const categoriesData = useSelector(state => state.tasks.categoriesData);
+    const [categoriesData, setCategoriesData] = useState([]);
+
+    useEffect(() => {
+        readCategoriesData(setCategoriesData);
+    }, [])
 
     return (
         <Paper
@@ -26,16 +31,12 @@ const ManageCategories = () => {
 
             <Divider />
 
-            <ManagableStringDataList
-                title='Categories list'
-                inputLabel='Category'
-                listItems={categoriesData.categories}
-                url={categoriesData.url}
-                fetchDataFunc={fetchCategoriesData}
-            />
+            <DataList categoriesData={categoriesData} />
+
+            <NewGroup />
 
         </Paper>
     );
 };
 
-export default ManageCategories;
+export default ManageCategoriesData;

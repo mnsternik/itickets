@@ -14,7 +14,6 @@ const NewGroup = () => {
     };
 
     const addNewGroupHandler = () => {
-
         const newGroupId = groupName
             .split(' ')
             .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
@@ -26,6 +25,8 @@ const NewGroup = () => {
         };
 
         writeNewGroupData(newGroup);
+
+        setGroupName('');
     }
 
     return (
@@ -47,9 +48,7 @@ const NewGroup = () => {
                 Add
             </Button>
         </Box>
-
     )
-
 };
 
 export default NewGroup;

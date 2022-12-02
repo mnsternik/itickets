@@ -20,9 +20,9 @@ export function writeNewTaskData(taskData) {
     set(newTaskRef, taskData);
 };
 
-export function writeNewTaskId() {
+/*export function writeNewTaskId() {
     const newTaskIdRef = ref(db, 'id');
-}
+}*/
 
 
 
@@ -45,8 +45,8 @@ export function writeNewGroupMember(groupName, userId) {
 
 
 export function writeCategoryData(category) {
-    const newCategoryRef = ref(db, 'categories');
-    push(newCategoryRef, category)
+    const newCategoryRef = ref(db, '/categories/' + category.id);
+    set(newCategoryRef, category)
 };
 
 
@@ -99,9 +99,16 @@ export function readCategoriesData(updateCategories) {
     const categoriesRef = ref(db, 'categories');
     onValue(categoriesRef, (snapshot) => {
         const categories = snapshot.val();
-        updateCategories(categories);
+        const transformedCategories = [];
+
+        for (let categoryKey in categories) {
+            transformedCategories.push(categories[categoryKey]);
+        }
+
+        updateCategories(transformedCategories);
     });
 };
+
 
 
 export function readGroupsData(updateGroups) {
@@ -152,5 +159,10 @@ export function deleteResponse(taskId, responseKey) {
 export function deleteGroup(groupId) {
     const groupRef = ref(db, '/groups/' + groupId);
     set(groupRef, null)
+};
+
+export function deleteCategory(categoryId) {
+    const categoriesRef = ref(db, '/categories/' + categoryId);
+    set(categoriesRef, null)
 };
 
