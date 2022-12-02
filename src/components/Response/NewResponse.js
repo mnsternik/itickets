@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import useHttp from '../../../hooks/useHttp';
-import { fetchTasksData } from '../../../store/tasks';
-
-import { writeResponseData } from '../../../lib/api';
-
-//import { ref, set, child, push } from 'firebase/database';
-//import { db } from '../../../util/firebase';
+import { writeNewResponseData, updateSingleTaskData } from '../../lib/api';
 
 import { Button, Box, TextField, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 //import SelectInput from '../../../UI/SelectInput';
@@ -17,8 +11,6 @@ const NewResponse = (props) => {
     const [isResponsePrivate, setIsResponsePrivate] = useState('Public');
 
     const username = useSelector(state => state.auth.username);
-
-    const { isLoading: fetchTaskLoading, error: fetchTaskError, sendRequest: sendUpdatedTask } = useHttp();
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
         day: 'numeric',
@@ -37,36 +29,20 @@ const NewResponse = (props) => {
         setResponseInputValue(event.target.value)
     };
 
-    const addResponseClickHandler = (event) => {
-        let updatedTask = structuredClone(props.taskData);
-        const taskUrl = `https://iticket-fd059-default-rtdb.firebaseio.com/tasks/${updatedTask.firebaseKey}.json`;
 
+    const addResponseClickHandler = () => {
+        let updatedTask = structuredClone(props.taskData);
         const responseData = {
-            id: Math.floor(Math.random() * 1000).toString(),
-            taskId: updatedTask.id,
             author: username,
             createDate: dateFormatter.format(new Date()),
             message: responseInputValue,
             visibility: isResponsePrivate
         };
 
-        if (!updatedTask.responses) {
-            updatedTask.responses = [responseData]
-        } else {
-            updatedTask.responses.push(responseData)
-        }
-
         updatedTask.modificationDate = dateFormatter.format(new Date());
 
-        //writeResponseData(updatedTask.id, responseData);
-
-        sendUpdatedTask({
-            url: taskUrl,
-            method: 'PUT',
-            body: updatedTask,
-        }, fetchTasksData);
-
-        props.onTaskUpdate(updatedTask);
+        writeNewResponseData(updatedTask.id, responseData)
+        updateSingleTaskData(updatedTask);
 
         setResponseInputValue('')
     };

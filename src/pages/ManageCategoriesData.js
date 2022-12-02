@@ -3,10 +3,10 @@ import { fetchCategoriesData } from '../store/tasks';
 
 import ManagableStringDataList from '../UI/ManagableStringDataList';
 
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { Paper, Divider, Typography } from '@mui/material';
 
-const ManageTasksData = () => {
+
+const ManageCategories = () => {
 
     const categoriesData = useSelector(state => state.tasks.categoriesData);
 
@@ -20,10 +20,11 @@ const ManageTasksData = () => {
                 flexDirection: 'column',
             }}>
 
-            <Typography variant='h5' sx={{ textAlign: 'center' }}>
-                Task data manager
+            <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
+                Categories data manager
             </Typography>
 
+            <Divider />
 
             <ManagableStringDataList
                 title='Categories list'
@@ -37,4 +38,4 @@ const ManageTasksData = () => {
     );
 };
 
-export default ManageTasksData;
+export default ManageCategories;

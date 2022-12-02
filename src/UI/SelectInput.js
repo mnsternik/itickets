@@ -2,7 +2,6 @@ import { InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 
 //import { styled } from '@mui/material/styles';
 
-//import classes from './SelectInput.css';
 
 const SelectInput = (props) => {
 

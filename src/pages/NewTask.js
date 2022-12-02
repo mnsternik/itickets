@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import useHttp from './../hooks/useHttp';
+import { readNewTaskId, writeNewTaskData } from '../lib/api';
 
 import NewTaskForm from '../components/NewTask/NewTaskForm';
 
-import { Button, Typography, Paper } from '@mui/material';
+import { Button, Typography, Paper, Divider } from '@mui/material';
 
 const NewTask = () => {
 
@@ -13,10 +13,14 @@ const NewTask = () => {
     const [priorityInputValue, setPriorityInputValue] = useState('');
     const [categoryInputValue, setCategoryInputValue] = useState('');
 
-    const { isLoading: sendTaskLoading, error: sendTaskError, sendRequest: sendTask } = useHttp();
-
     const user = useSelector(state => state.auth.username);
     const categories = useSelector(state => state.tasks.categoriesData.categories);
+
+    const [newTaskId, setNewTaskId] = useState('');
+
+    useEffect(() => {
+        readNewTaskId(setNewTaskId);
+    }, [])
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
         day: 'numeric',
@@ -42,7 +46,6 @@ const NewTask = () => {
         setCategoryInputValue(event.target.value);
     };
 
-
     const clearForm = () => {
         setTitleInputValue('');
         setDescriptionInputValue('');
@@ -55,7 +58,7 @@ const NewTask = () => {
         event.preventDefault();
 
         const newTask = {
-            id: Math.floor(Math.random() * 1000).toString(), // <- id should be from response from firebase?
+            id: newTaskId,
             createDate: dateFormatter.format(new Date()),
             modificationDate: dateFormatter.format(new Date()),
             priority: parseInt(priorityInputValue),
@@ -66,14 +69,9 @@ const NewTask = () => {
             status: 'Open',
             currentUser: 'None',
             currentGroup: 'Helpdesk',
-            responses: []
-        }
+        };
 
-        sendTask({
-            url: 'https://iticket-fd059-default-rtdb.firebaseio.com/tasks.json',
-            method: 'POST',
-            body: newTask,
-        });
+        writeNewTaskData(newTask);
 
         clearForm();
     };
@@ -91,9 +89,11 @@ const NewTask = () => {
                 justifyContent: 'space-evenly',
             }}>
 
-            <Typography variant="h6" gutterBottom sx={{}}>
+            <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                 Create new task
             </Typography>
+
+            <Divider />
 
             <NewTaskForm
                 categories={categories}

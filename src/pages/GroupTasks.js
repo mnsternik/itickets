@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchTasksData } from '../store/tasks';
-import { fetchGroupsData } from '../store/users';
+import { useSelector, } from 'react-redux';
+import { readAllTasksData, readGroupsData } from '../lib/api';
 
 import TasksTable from './../components/TasksTable/TasksTable';
 import TasksTableActions from './../components/TasksTable/TasksTableActions';
 
 const GroupTasks = () => {
 
-    const dispatch = useDispatch();
-
-    const { tasks, error } = useSelector(state => state.tasks.tasksData);
     const userGroup = useSelector(state => state.auth.group);
-    const allGroups = useSelector(state => state.users.groupsData.groups);
+
+    let error; // what to do with this? 
+    const [tasks, setTasks] = useState([]);
+    const [groups, setGroups] = useState([]);
 
     const [filterItem, setFilterItem] = useState(userGroup);
     const [sortingItem, setSortingItem] = useState('Priority');
@@ -28,9 +27,10 @@ const GroupTasks = () => {
         .join('');
 
     useEffect(() => {
-        dispatch(fetchTasksData());
-        dispatch(fetchGroupsData());
-    }, [dispatch]);
+        readAllTasksData(setTasks);
+        readGroupsData(setGroups)
+    }, [])
+
 
     // open tasks assigned to user's group 
     const filteredTasks = tasks.filter(task => task.currentGroup === filterItem && (task.status !== 'Canceled' && task.status !== 'Closed'));
@@ -76,7 +76,7 @@ const GroupTasks = () => {
             <TasksTableActions
                 labels={labels}
                 filterItem={filterItem}
-                filterOptions={allGroups}
+                filterOptions={groups}
                 filteredKey='currentGroup'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}

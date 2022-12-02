@@ -1,54 +1,34 @@
 import { ref, set, onValue, push, child } from 'firebase/database';
 import { db } from '../util/firebase';
 
-export function writeResponseData(taskId, responseData) {
+//add check if data exists (for example 2 groups with same name? 
+
+export function writeNewResponseData(taskId, responseData) {
     const newResponseRef = push(child(ref(db), '/responses/' + taskId));
     const newResponseKey = newResponseRef.key;
 
-    set(newResponseRef, {
-        id: newResponseKey,
-        author: responseData.author,
-        createDate: responseData.createDate,
-        message: responseData.message,
-        visibility: responseData.visibility
-    }).catch(error => {
-        console.log(error);
-    })
+    set(newResponseRef, { ...responseData, id: newResponseKey }
+        .catch(error => {
+            console.log(error);
+        })
+    )
 };
 
 
-/*export function writeTaskData(taskData) {
-    const newTaskId = allTasks.length++;
-    const newTaskRef = ref(db, '/tasks/' + newTaskId);
+export function writeNewTaskData(taskData) {
+    const newTaskRef = ref(db, '/tasks/' + taskData.id);
+    set(newTaskRef, taskData);
+};
 
-    set(newTaskRef, {
-        id: newTaskId,
-        createDate: taskData.createDate,
-        modificationDate: taskData.modificationDate,
-        priority: taskData.priority,
-        category: taskData.category,
-        title: taskData.title,
-        description: taskData.description,
-        author: taskData.author,
-        status: taskData.status,
-        currentUser: taskData.currentUser,
-        currentGroup: taskData.currentGroup
-    })
-};*/
+export function writeNewTaskId() {
+    const newTaskIdRef = ref(db, 'id');
+}
 
 
-export function writeGroupData(groupName) {
-    const newGroupId = groupName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
 
-    const newGroupRef = ref(db, '/groups/' + newGroupId);
-
-    set(newGroupRef, {
-        name: groupName,
-        // members property will be added when writeNewGroupMember will be called (?)
-    })
+export function writeNewGroupData(groupData) {
+    const newGroupRef = ref(db, '/groups/' + groupData.id);
+    set(newGroupRef, groupData);
 };
 
 
@@ -69,49 +49,73 @@ export function writeCategoryData(category) {
     push(newCategoryRef, category)
 };
 
-/*
-export function readAllTasksData() {
-    const tasksRef = ref(db, 'tasks');
-    onValue(tasksRef, (snapshot) => {
-        const tasksData = snapshot.val();
-        updateTasks(tasksData);
-    })
+
+export function updateSingleTaskData(taskData) {
+    const newTaskRef = ref(db, '/tasks/' + taskData.id);
+    set(newTaskRef, taskData)
 };
 
 
-export function readSingleTaskData(taskId) {
+export function readAllTasksData(updateTasks) {
+    const tasksRef = ref(db, 'tasks');
+    return onValue(tasksRef, (snapshot) => {
+        const fetchedTasks = snapshot.val();
+        const transformedTasks = [];
+
+        for (const taskKey in fetchedTasks) {
+            transformedTasks.push(fetchedTasks[taskKey])
+        }
+
+        updateTasks(transformedTasks);
+    });
+};
+
+
+export function readSingleTaskData(taskId, updateTask) {
     const taskRef = ref(db, '/tasks/' + taskId);
     onValue(taskRef, (snapshot) => {
         const taskData = snapshot.val();
         updateTask(taskData);
-    })
+    });
 };
 
 
-export function readResponseData(taskId) {
+export function readResponseData(taskId, updateResponses) {
     const responsesRef = ref(db, '/responses/' + taskId);
-    onValue(responsesRef, (snapshot) => {
-        const responsesData = snapshot.val();
-        updateResponses(responsesData);
+    return onValue(responsesRef, (snapshot) => {
+        const fetchedResponses = snapshot.val()
+        const transformedResponses = [];
+
+        for (const resKey in fetchedResponses) {
+            transformedResponses.push(fetchedResponses[resKey])
+        }
+
+        updateResponses(transformedResponses);
     })
 };
 
 
-export function readCategoriesData() {
+export function readCategoriesData(updateCategories) {
     const categoriesRef = ref(db, 'categories');
     onValue(categoriesRef, (snapshot) => {
-        const categoriesData = snapshot.val();
-        updateCategories(categoriesData);
-    })
+        const categories = snapshot.val();
+        updateCategories(categories);
+    });
 };
 
 
-export function readGroupsData() {
+export function readGroupsData(updateGroups) {
     const groupsRef = ref(db, 'groups');
     onValue(groupsRef, (snapshot) => {
-        const groupsData = snapshot.val();
-        updateGroups(groupsData);
-    })
+        const groups = snapshot.val();
+        const transformedGroups = [];
+
+        for (let groupKey in groups) {
+            transformedGroups.push(groups[groupKey]);
+        }
+
+        updateGroups(transformedGroups);
+    });
 };
 
 
@@ -123,7 +127,30 @@ export function readSingleGroupData(groupName) {
 
     const groupRef = ref(db, '/groups/' + groupId);
     onValue(groupRef, (snapshot) => {
-        const groupData = snapshot.val();
-        updateGroup(groupData);
-    })
-};*/
+        return snapshot.val();
+    });
+};
+
+
+export function readNewTaskId(setNewTaskId) {
+    const tasksRef = ref(db, 'tasks');
+    //check if exists
+    //create just uid and add 1 evertytime task is created? 
+    return onValue(tasksRef, (snapshot) => {
+        const newTaskId = Object.keys(snapshot.val()).length + 1;
+        setNewTaskId(newTaskId);
+    });
+};
+
+
+export function deleteResponse(taskId, responseKey) {
+    const responseRef = ref(db, '/responses/' + taskId + '/' + responseKey);
+    set(responseRef, null)
+};
+
+
+export function deleteGroup(groupId) {
+    const groupRef = ref(db, '/groups/' + groupId);
+    set(groupRef, null)
+};
+

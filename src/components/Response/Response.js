@@ -22,7 +22,7 @@ const Response = (props) => {
     const showResponse = visibility === 'Public' || (visibility === 'Private' && (taskAuthor === user || resAuthor === user))
 
     const deleteResponseHandler = (event) => {
-        props.onDelete(resId);
+        props.onDelete(taskId, resId);
     }
 
     return (

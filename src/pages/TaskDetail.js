@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import useHttp from '../hooks/useHttp';
+import { readSingleTaskData } from '../lib/api';
 
-import { Divider, Button, Paper } from '@mui/material';
+
+import { Divider, Paper } from '@mui/material';
 
 import TaskDetailForm from '../components/TaskDetail/TaskDetailForm';
-import NewResponse from '../components/TaskDetail/Response/NewResponse';
-import ResponsesList from '../components/TaskDetail/Response/ResponsesList';
+import NewResponse from '../components/Response/NewResponse';
+import ResponsesList from '../components/Response/ResponsesList';
 import TaskDetailActions from '../components/TaskDetail/TaskDetailActions';
 
 const TaskDetail = () => {
 
     //add notaskfound component or smth
+    const params = useParams();
+    const { taskId } = params;
 
-
-
+    const [isFormDisabled, setIsFormDisabled] = useState(true);
     const [taskData, setTaskData] = useState({
         id: '',
         priority: '',
@@ -27,37 +28,17 @@ const TaskDetail = () => {
         description: '',
         createDate: '',
         modificationDate: '',
-        responses: [],
     });
 
-    const [showResponsesList, setShowResponsesList] = useState(false);
-    const [isFormDisabled, setIsFormDisabled] = useState(true);
-
-    const dispatch = useDispatch();
-
-    const params = useParams();
-    const { taskId } = params;
-
-    const { isLoading: fetchTaskLoading, error: fetchTaskError, sendRequest: fetchTasks } = useHttp();
-
     useEffect(() => {
-        const extractTask = (tasks) => {
+        readSingleTaskData(taskId, setTaskData);
+    }, [taskId])
 
-            if (!tasks) {
-                console.log('no task with this id in firebase')
-                return;
-            }
-
-            const fetchedTasks = [];
-            for (const taskKey in tasks) {
-                fetchedTasks.push({ ...tasks[taskKey], firebaseKey: taskKey })
-            }
-
-            setTaskData(fetchedTasks.find(task => task.id === taskId));
-        };
-
-        fetchTasks({ url: 'https://iticket-fd059-default-rtdb.firebaseio.com/tasks.json' }, extractTask)
-    }, [fetchTasks, dispatch, taskId])
+    const taskPropertyChangeHandler = (event, propertyName) => {
+        const updatedTask = structuredClone(taskData);
+        updatedTask[propertyName] = event.target.value;
+        setTaskData(updatedTask);
+    };
 
     const priorityChangeHandler = (event) => {
         setTaskData({ ...taskData, priority: event.target.value });
@@ -77,10 +58,6 @@ const TaskDetail = () => {
 
     const statusChangeHandler = (event) => {
         setTaskData({ ...taskData, status: event.target.value });
-    };
-
-    const toggleResponsesList = () => {
-        setShowResponsesList(prevState => !prevState)
     };
 
     const toggleFormChangeable = () => {
@@ -126,11 +103,7 @@ const TaskDetail = () => {
 
             />
 
-            <Button onClick={toggleResponsesList} disabled={!taskData.responses}>
-                {showResponsesList ? 'Hide responses' : `Show responses (${taskData.responses ? taskData.responses.length : '0'})`}
-            </Button>
-
-            {showResponsesList && <ResponsesList taskData={taskData} onTaskUpdate={updateTaskHandler} />}
+            <ResponsesList taskData={taskData} />
 
             <NewResponse taskData={taskData} onTaskUpdate={updateTaskHandler} />
 

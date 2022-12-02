@@ -14,7 +14,8 @@ const NewTaskForm = (props) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-evenly',
-            minHeight: 450
+            minHeight: 450,
+            mt: 3
         }}>
 
             <TextField

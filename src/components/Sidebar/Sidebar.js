@@ -26,8 +26,10 @@ const Sidebar = () => {
   ];
 
   const administrationLinksData = [
-    { text: 'Manage users data', path: '/manage-users-data' },
-    { text: 'Manage tasks data', path: '/manage-tasks-data' },
+    { text: 'Manage users', path: '/manage-users' },
+    { text: 'Manage groups ', path: '/manage-groups' },
+    { text: 'Manage categories', path: '/manage-categories' }
+
   ];
 
   const toggleSidebar = () => {

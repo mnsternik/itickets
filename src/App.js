@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux/es/exports";
 import { fetchCategoriesData, fetchTasksData } from './store/tasks';
@@ -11,16 +11,13 @@ import Search from './pages/Search';
 import TaskDetail from './pages/TaskDetail';
 import UserTasks from './pages/UserTasks';
 import UserCreatedTasks from './pages/UserCreatedTasks';
-import ManageTasksData from './pages/ManageTasksData';
+import ManageCategoriesData from './pages/ManageCategoriesData';
+import ManageGroupsData from './pages/ManageGroupsData';
 import ManageUsersData from './pages/ManageUsersData';
 import Account from './pages/Account';
 import NotFound from './pages/NotFound';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Container from '@mui/material/Container';
-import CssBaseline from '@mui/material/CssBaseline';
-import CircularProgress from '@mui/material/CircularProgress';
-
+import { ThemeProvider, createTheme, Container, CssBaseline } from '@mui/material';
 import './App.css';
 
 
@@ -74,8 +71,9 @@ function App() {
               <Route path='/group-tasks' element={<GroupTasks />} />
               <Route path='/tasks/:taskId' element={<TaskDetail />} />
               <Route path='/search' element={<Search />} />
-              <Route path='/manage-tasks-data' element={<ManageTasksData />} />
-              <Route path='/manage-users-data' element={<ManageUsersData />} />
+              <Route path='/manage-categories' element={<ManageCategoriesData />} />
+              <Route path='/manage-groups' element={<ManageGroupsData />} />
+              <Route path='/manage-users' element={<ManageUsersData />} />
               <Route path='/account' element={<Account />} />
               <Route path='*' element={<NotFound />} />
             </Routes>

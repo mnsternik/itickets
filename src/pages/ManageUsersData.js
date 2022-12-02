@@ -19,10 +19,11 @@ const ManageUsersData = () => {
                 my: 4,
                 display: 'flex',
                 flexDirection: 'column',
-            }}>
+            }
+            }>
 
             <Typography variant='h5' sx={{ textAlign: 'center' }}>
-                User data manager
+                Users data manager
             </Typography>
 
             <ManagableStringDataList

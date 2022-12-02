@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import useHttp from "../../hooks/useHttp";
-import { fetchTasksData } from './../../store/tasks';
-
-import Box from "@mui/system/Box";
-import Button from "@mui/material/Button";
-import Alert from '@mui/material/Alert';
+import { updateSingleTaskData } from '../../lib/api';
+import { Box, Button, Alert } from "@mui/material";
 
 const TaskDetailActions = (props) => {
 
@@ -17,14 +13,10 @@ const TaskDetailActions = (props) => {
 
     const navigate = useNavigate();
 
-    const { isLoading: assignLoading, error: assignError, sendRequest: sendUpdatedTask } = useHttp();
-
     //show "Assign to me" button only when logged user is not task's currentUser and logged user's group IS task's currentGroup
     const showAssignButton = user !== props.taskData.currentUser && group === props.taskData.currentGroup && props.isFormDisabled;
     const showEditButton = user === props.taskData.currentUser && props.isFormDisabled;
     const showSaveButton = !props.isFormDisabled;
-
-    const taskUrl = `https://iticket-fd059-default-rtdb.firebaseio.com/tasks/${props.taskData.firebaseKey}.json`;
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
         day: 'numeric',
@@ -43,13 +35,7 @@ const TaskDetailActions = (props) => {
         updatedTask.status = 'In progress';
         updatedTask.modificationDate = dateFormatter.format(new Date());
 
-        sendUpdatedTask({
-            url: taskUrl,
-            method: 'PUT',
-            body: updatedTask,
-        }, fetchTasksData);
-
-        props.onUpdate(updatedTask);
+        updateSingleTaskData(updatedTask);
     };
 
 
@@ -60,16 +46,11 @@ const TaskDetailActions = (props) => {
 
     const saveClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
-        props.onToggleFormChangeable();
-        setShowSuccesAlert(true);
-
         updatedTask.modificationDate = dateFormatter.format(new Date());
 
-        sendUpdatedTask({
-            url: taskUrl,
-            method: 'PUT',
-            body: updatedTask,
-        }, fetchTasksData);
+        props.onToggleFormChangeable();
+        updateSingleTaskData(updatedTask);
+        setShowSuccesAlert(true);
     };
 
 

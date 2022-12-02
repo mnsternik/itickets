@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchTasksData } from '../store/tasks';
+import { useSelector } from 'react-redux';
+import { readAllTasksData } from '../lib/api';
 
 import TasksTable from './../components/TasksTable/TasksTable';
 import TasksTableActions from './../components/TasksTable/TasksTableActions';
@@ -9,10 +9,10 @@ const DUMMY_USERS = ['user1', 'user2', 'user3'];
 
 const UserCreatedTasks = () => {
 
-    const dispatch = useDispatch();
-
-    const { tasks, error } = useSelector(state => state.tasks.tasksData);
     const user = useSelector(state => state.auth.username);
+
+    let error;
+    const [tasks, setTasks] = useState([]);
 
     const [filterItem, setFilterItem] = useState(user);
     const [sortingItem, setSortingItem] = useState('Priority');
@@ -27,8 +27,8 @@ const UserCreatedTasks = () => {
         .join('');
 
     useEffect(() => {
-        dispatch(fetchTasksData());
-    }, [dispatch]);
+        readAllTasksData(setTasks);
+    }, []);
 
     // open tasks assigned to user's group 
     const filteredTasks = tasks.filter(task => task.author === filterItem && (task.status !== 'Canceled' && task.status !== 'Closed'));
