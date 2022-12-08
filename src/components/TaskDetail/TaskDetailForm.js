@@ -1,15 +1,17 @@
 import { useSelector } from 'react-redux';
 
 import { TextField, Box, Typography } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
 import SelectInput from "../../UI/SelectInput";
 
 const DUMMY_USERS = ['user1', 'user2', 'user3', 'None'];
 
 const TaskDetailForm = (props) => {
 
-    const categories = useSelector(state => state.tasks.categoriesData.categories);
-    const groups = useSelector(state => state.users.groupsData.groups);
     const priorities = useSelector(state => state.tasks.priorities);
+
+    const { groups, categories } = props;
 
     return (
         <Box sx={{
@@ -34,6 +36,7 @@ const TaskDetailForm = (props) => {
                     value={props.taskData.category}
                     options={categories}
                     inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
                 />
 
                 <SelectInput
@@ -42,6 +45,7 @@ const TaskDetailForm = (props) => {
                     value={props.taskData.status}
                     options={['Open', 'In progress', 'Closed', 'Canceled']}
                     inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
                 />
 
                 <SelectInput
@@ -51,6 +55,7 @@ const TaskDetailForm = (props) => {
                     structure='objects'
                     options={priorities}
                     inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
                 />
             </Box>
 
@@ -61,6 +66,7 @@ const TaskDetailForm = (props) => {
                     value={props.taskData.currentUser}
                     options={DUMMY_USERS}
                     inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
                 />
 
                 <SelectInput
@@ -69,6 +75,8 @@ const TaskDetailForm = (props) => {
                     value={props.taskData.currentGroup}
                     options={groups}
                     inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
+
                 />
             </Box>
 

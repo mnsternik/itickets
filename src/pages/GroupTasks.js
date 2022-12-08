@@ -20,6 +20,8 @@ const GroupTasks = () => {
     //labels must correspond to tasks properities names
     const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
 
+    const groupsNamesArr = groups.map(group => group.name);
+
     // changes sortingItem to camelCase property name
     const sortingKey = sortingItem
         .split(' ')
@@ -76,7 +78,7 @@ const GroupTasks = () => {
             <TasksTableActions
                 labels={labels}
                 filterItem={filterItem}
-                filterOptions={groups}
+                filterOptions={groupsNamesArr}
                 filteredKey='currentGroup'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}

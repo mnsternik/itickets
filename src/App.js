@@ -73,7 +73,7 @@ function App() {
               <Route path='/search' element={<Search />} />
               <Route path='/manage-categories' element={<ManageCategoriesData />} />
               <Route path='/manage-groups' element={<ManageGroupsData />} />
-              <Route path='/manage-users' element={<ManageUsersData />} />
+
               <Route path='/account' element={<Account />} />
               <Route path='*' element={<NotFound />} />
             </Routes>

@@ -6,7 +6,6 @@ import SelectInput from "../../UI/SelectInput";
 
 const NewTaskForm = (props) => {
 
-    const categories = useSelector(state => state.tasks.categoriesData.categories);
     const priorities = useSelector(state => state.tasks.priorities);
 
     return (
@@ -48,7 +47,7 @@ const NewTaskForm = (props) => {
                 label='Category'
                 value={props.category}
                 onChange={props.onCategoryChange}
-                options={categories}
+                options={props.categories}
                 sx={{ width: 180 }}
             />
 

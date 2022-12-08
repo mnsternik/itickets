@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { readSingleTaskData } from '../lib/api';
-
-
-import { Divider, Paper } from '@mui/material';
+import { readSingleTaskData, readGroupsData, readCategoriesData } from '../lib/api';
 
 import TaskDetailForm from '../components/TaskDetail/TaskDetailForm';
 import NewResponse from '../components/Response/NewResponse';
 import ResponsesList from '../components/Response/ResponsesList';
 import TaskDetailActions from '../components/TaskDetail/TaskDetailActions';
+
+import { Divider, Paper } from '@mui/material';
 
 const TaskDetail = () => {
 
@@ -17,6 +16,8 @@ const TaskDetail = () => {
     const { taskId } = params;
 
     const [isFormDisabled, setIsFormDisabled] = useState(true);
+    const [groups, setGroups] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [taskData, setTaskData] = useState({
         id: '',
         priority: '',
@@ -30,15 +31,22 @@ const TaskDetail = () => {
         modificationDate: '',
     });
 
+    const groupsNamesArr = groups.map(group => group.name);
+    const categoriesNamesArr = categories.map(category => category.name);
+
     useEffect(() => {
         readSingleTaskData(taskId, setTaskData);
+        readGroupsData(setGroups);
+        readCategoriesData(setCategories);
     }, [taskId])
 
+    /*
     const taskPropertyChangeHandler = (event, propertyName) => {
         const updatedTask = structuredClone(taskData);
         updatedTask[propertyName] = event.target.value;
         setTaskData(updatedTask);
     };
+    */
 
     const priorityChangeHandler = (event) => {
         setTaskData({ ...taskData, priority: event.target.value });
@@ -98,6 +106,8 @@ const TaskDetail = () => {
                 onCurrentGroupChange={currentGroupChangeHandler}
                 onCategoryChange={categoryChangeHandler}
                 onStatusChange={statusChangeHandler}
+                groups={groupsNamesArr}
+                categories={categoriesNamesArr}
                 taskData={taskData}
                 isFormDisabled={isFormDisabled}
 

@@ -19,7 +19,8 @@ const NewTask = () => {
     const [newTaskId, setNewTaskId] = useState('');
     const [categories, setCategories] = useState([]);
 
-    // /const transformedCategories = categories.map(category => category.name);
+    const categoriesNamesArray = categories ?
+        categories.map(category => category.name) : [];
 
     useEffect(() => {
         readNewTaskId(setNewTaskId);
@@ -100,7 +101,7 @@ const NewTask = () => {
             <Divider />
 
             <NewTaskForm
-                categories={categories}
+                categories={categoriesNamesArray}
                 title={titleInputValue}
                 description={descriptionInputValue}
                 priority={priorityInputValue}

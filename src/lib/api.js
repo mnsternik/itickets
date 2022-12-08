@@ -7,11 +7,7 @@ export function writeNewResponseData(taskId, responseData) {
     const newResponseRef = push(child(ref(db), '/responses/' + taskId));
     const newResponseKey = newResponseRef.key;
 
-    set(newResponseRef, { ...responseData, id: newResponseKey }
-        .catch(error => {
-            console.log(error);
-        })
-    )
+    set(newResponseRef, { ...responseData, id: newResponseKey })
 };
 
 
@@ -141,11 +137,14 @@ export function readSingleGroupData(groupName) {
 
 export function readNewTaskId(setNewTaskId) {
     const tasksRef = ref(db, 'tasks');
-    //check if exists
-    //create just uid and add 1 evertytime task is created? 
     return onValue(tasksRef, (snapshot) => {
+        if (!snapshot.val()) {
+            setNewTaskId('T1');
+            return;
+        }
+
         const newTaskId = Object.keys(snapshot.val()).length + 1;
-        setNewTaskId(newTaskId);
+        setNewTaskId('T' + newTaskId);
     });
 };
 
