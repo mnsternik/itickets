@@ -15,7 +15,7 @@ const Account = () => {
 
     const dispatch = useDispatch();
     const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
-    const userInfo = useSelector(state => state.auth)
+    const userData = useSelector(state => state.auth.userData);
 
     const handleChange = (event) => {
         dispatch(uiActions.toggleDarkMode())
@@ -43,10 +43,13 @@ const Account = () => {
                     User info
                 </Typography>
                 <Typography variant='body1'>
-                    Username: {userInfo.username}
+                    Username: {userData.name}
                 </Typography>
                 <Typography variant='body1'>
-                    E-mail: {userInfo.mail}
+                    Group: {userData.group}
+                </Typography>
+                <Typography variant='body1'>
+                    E-mail: {userData.email}
                 </Typography>
             </Box>
 

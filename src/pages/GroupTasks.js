@@ -7,7 +7,7 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 
 const GroupTasks = () => {
 
-    const userGroup = useSelector(state => state.auth.group);
+    const userGroup = useSelector(state => state.auth.userData.group);
 
     let error; // what to do with this? 
     const [tasks, setTasks] = useState([]);
