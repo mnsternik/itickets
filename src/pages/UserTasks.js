@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { readAllTasksData } from '../lib/api';
+import { readAllTasksData, readAllUsersData } from '../lib/api';
 
 import TasksTable from './../components/TasksTable/TasksTable';
 import TasksTableActions from './../components/TasksTable/TasksTableActions';
 
-// temporary
-const DUMMY_USERS = ['user1', 'user2', 'user3', 'None'];
-
 const UserTasks = () => {
 
-    const user = useSelector(state => state.auth.username);
+    const userData = useSelector(state => state.auth.userData);
+    const [allUsers, setAllUsers] = useState([]);
+    const [filterItem, setFilterItem] = useState({ name: userData.name, value: userData.uid });
 
-    let error;
     const [tasks, setTasks] = useState([]);
 
-    const [filterItem, setFilterItem] = useState(user);
     const [sortingItem, setSortingItem] = useState('Priority');
     const [sortingOrder, setSortingOrder] = useState('Ascending');
 
     const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
+
+    // select input option expects a "value" property
+    const allUsersSelectOptions = allUsers.map(user => ({ name: user.name, value: user.uid }));
 
     // changes sortingItem to camelCase property name
     const sortingKey = sortingItem
@@ -28,34 +28,37 @@ const UserTasks = () => {
         .join('');
 
     useEffect(() => {
-        readAllTasksData(setTasks);
+        readAllTasksData(setTasks); //setError
+        readAllUsersData(setAllUsers); //setError
     }, []);
 
-    // open tasks assigned to logged user
-    const filteredTasks = tasks.filter(task => task.currentUser === filterItem && (task.status !== 'Canceled' && task.status !== 'Closed'));
+    // filter open tasks assigned to logged user
+    const filteredTasks = tasks.filter(task => task.currentUserId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
 
     let sortedTasks = [];
     if (filteredTasks.length) {
 
+        //sorting item is string
         if (typeof filteredTasks[0][sortingKey] === 'string') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])) :
                 filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])).reverse();
         }
 
+        //sorting item is number
         else if (typeof filteredTasks[0][sortingKey] === 'number') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]) :
                 filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]).reverse();
         }
 
+        //sorting item is date
         else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => Date.parse(a[sortingKey]) - Date.parse(b[sortingKey])) :
                 filteredTasks.sort((a, b) => Date.parse(a[sortingKey]) - Date.parse(b[sortingKey])).reverse();
         }
     }
-
 
     const filterItemChangeHandler = (updatedFilterItem) => {
         setFilterItem(updatedFilterItem);
@@ -75,7 +78,7 @@ const UserTasks = () => {
             <TasksTableActions
                 labels={labels}
                 filterItem={filterItem}
-                filterOptions={DUMMY_USERS}
+                filterOptions={allUsersSelectOptions}
                 filteredKey='currentUser'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}
@@ -87,7 +90,6 @@ const UserTasks = () => {
 
             <TasksTable
                 tasks={sortedTasks}
-                error={error}
                 labels={labels}
             />
         </>
