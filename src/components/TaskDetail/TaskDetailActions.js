@@ -8,14 +8,14 @@ const TaskDetailActions = (props) => {
 
     const [showSuccessAlert, setShowSuccesAlert] = useState(false);
 
-    const user = useSelector(state => state.auth.username);
-    const group = useSelector(state => state.auth.group);
+    const userData = useSelector(state => state.auth.userData);
+    const group = useSelector(state => state.auth.userData.group);
 
     const navigate = useNavigate();
 
     //show "Assign to me" button only when logged user is not task's currentUser and logged user's group IS task's currentGroup
-    const showAssignButton = user !== props.taskData.currentUser && group === props.taskData.currentGroup && props.isFormDisabled;
-    const showEditButton = user === props.taskData.currentUser && props.isFormDisabled;
+    const showAssignButton = userData.uid !== props.taskData.currentUserId && group === props.taskData.currentGroup && props.isFormDisabled;
+    const showEditButton = userData.uid === props.taskData.currentUserId && props.isFormDisabled;
     const showSaveButton = !props.isFormDisabled;
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -30,7 +30,8 @@ const TaskDetailActions = (props) => {
     const assignClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
 
-        updatedTask.currentUser = user;
+        updatedTask.currentUserId = userData.uid;
+        updatedTask.currentUser = userData.name;
         updatedTask.currentGroup = group;
         updatedTask.status = 'In progress';
         updatedTask.modificationDate = dateFormatter.format(new Date());

@@ -32,9 +32,11 @@ const TaskDetailForm = (props) => {
             <Box sx={{ display: 'flex', flexDirection: 'row', my: 1 }}>
                 <SelectInput
                     label='Category'
-                    onChange={props.onCategoryChange}
-                    value={props.taskData.category}
                     options={categories}
+                    onChange={props.onCategoryChange}
+                    defaultValue=''
+                    value={props.taskData.category}
+
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
                 />
@@ -63,7 +65,7 @@ const TaskDetailForm = (props) => {
                 <SelectInput
                     label='Current user'
                     onChange={props.onCurrentUserChange}
-                    value={props.taskData.currentUser}
+                    value={props.taskData.currentUser || 'None'}
                     options={DUMMY_USERS}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
