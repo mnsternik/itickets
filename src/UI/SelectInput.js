@@ -1,21 +1,7 @@
 import { InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 
-//import { styled } from '@mui/material/styles';
-
-
 const SelectInput = (props) => {
 
-    // const { showArrow} = props.showArrow
-
-    /*const CustomizedInput = styled(Select)`
-    & .Mui-disabled {
-
-    }
-    & .MuiSelect-icon {
-
-    }`;
-    //it works!
-    */
     let options;
     if (props.structure === 'objects') {
         options = props.options.map((option) => {
@@ -23,6 +9,7 @@ const SelectInput = (props) => {
                 <MenuItem
                     key={option.name + 'Key'}
                     value={option.value}
+                    sx={{ my: 'auto' }}
                 >
                     {option.name}
                 </MenuItem>
@@ -34,6 +21,7 @@ const SelectInput = (props) => {
                 <MenuItem
                     key={option + 'Key'}
                     value={option}
+                    sx={{ py: 'auto' }}
                 >
                     {option}
                 </MenuItem>
@@ -42,9 +30,10 @@ const SelectInput = (props) => {
     }
 
 
-
     return (
-        <FormControl fullWidth={props.fullWidth || false} sx={{ mx: 1 }}>
+        <FormControl
+            fullWidth={props.fullWidth || false}
+            sx={{ mx: 1 }}>
 
             <InputLabel id={props.labelId || props.label + 'LabelId'}>
                 {props.label}
@@ -53,8 +42,7 @@ const SelectInput = (props) => {
             <Select
                 labelId={props.labelId || props.label + 'LabelId'}
                 id={props.id || props.label + 'Id'}
-                value={props.value}
-                label={props.label}
+                defaultValue=''
                 onChange={props.onChange}
                 size={props.size || 'medium'}
                 {...props}
