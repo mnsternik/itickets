@@ -12,16 +12,19 @@ const TasksTableActions = (props) => {
     };
 
     const filterItemChangeHandler = (event) => {
-        props.onFilterItemChange(event.target.value)
+        const newFilter = props.filterOptions.find(item => item.value === event.target.value);
+        props.onFilterItemChange(newFilter);
     };
 
-    let filterSelect;
+    let filterSelectInput;
     if (props.filterOptions.length) {
-        filterSelect = (
+        filterSelectInput = (
             <SelectInput
                 label='Filter'
+                structure='objects'
                 options={props.filterOptions}
-                value={props.filterItem}
+                value={props.filterItem.value}
+                name={props.filterItem.name}
                 onChange={filterItemChangeHandler}
             />
         )
@@ -51,7 +54,7 @@ const TasksTableActions = (props) => {
                 />
             </Box>
 
-            {!props.hideFilter && filterSelect}
+            {!props.hideFilter && filterSelectInput}
 
         </Box>
     )
