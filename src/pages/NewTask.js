@@ -12,12 +12,10 @@ const NewTask = () => {
     const [descriptionInputValue, setDescriptionInputValue] = useState('');
     const [priorityInputValue, setPriorityInputValue] = useState('');
     const [categoryInputValue, setCategoryInputValue] = useState('');
-
-    const user = useSelector(state => state.auth.username);
-    //const categories = useSelector(state => state.tasks.categoriesData.categories);
-
     const [newTaskId, setNewTaskId] = useState('');
     const [categories, setCategories] = useState([]);
+
+    const userData = useSelector(state => state.auth.userData);
 
     const categoriesNamesArray = categories ?
         categories.map(category => category.name) : [];
@@ -70,14 +68,15 @@ const NewTask = () => {
             category: categoryInputValue,
             title: titleInputValue,
             description: descriptionInputValue,
-            author: user,
+            authorId: userData.uid,
+            author: userData.name,
             status: 'Open',
-            currentUser: 'None',
+            currentUserId: null,
+            currentUser: null,
             currentGroup: 'Helpdesk',
         };
 
         writeNewTaskData(newTask);
-
         clearForm();
     };
 
@@ -120,6 +119,7 @@ const NewTask = () => {
             >
                 Send
             </Button>
+
         </Paper>
     )
 };
