@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux';
-import { fetchGroupsData } from '../store/users';
+import { useState, useEffect } from 'react';
+import { readGroupsData, writeNewUserData } from '../lib/api';
 
-import ManagableStringDataList from '../UI/ManagableStringDataList';
+import AddUserForm from '../components/ManageData/Users/AddUserForm';
 
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -9,7 +9,13 @@ import Typography from '@mui/material/Typography';
 
 const ManageUsersData = () => {
 
-    const groupsData = useSelector(state => state.users.groupsData);
+    const [groups, setGroups] = useState([]);
+
+    const groupsNamesArr = groups.map(group => group.name);
+
+    useEffect(() => {
+        readGroupsData(setGroups);
+    }, [])
 
     return (
         <Paper
@@ -19,19 +25,14 @@ const ManageUsersData = () => {
                 my: 4,
                 display: 'flex',
                 flexDirection: 'column',
-            }
-            }>
+            }}>
 
-            <Typography variant='h5' sx={{ textAlign: 'center' }}>
+            <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                 Users data manager
             </Typography>
 
-            <ManagableStringDataList
-                title='Groups list'
-                inputLabel='Group'
-                listItems={groupsData.groups}
-                url={groupsData.url}
-                fetchDataFunc={fetchGroupsData}
+            <AddUserForm
+                groups={groupsNamesArr}
             />
 
         </Paper>
