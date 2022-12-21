@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { readSingleTaskData, readGroupsData, readCategoriesData } from '../lib/api';
+import { readSingleTaskData, readGroupsData, readCategoriesData, readAllUsersData } from '../lib/api';
 
 import TaskDetailForm from '../components/TaskDetail/TaskDetailForm';
 import NewResponse from '../components/Response/NewResponse';
@@ -18,6 +18,7 @@ const TaskDetail = () => {
     const [isFormDisabled, setIsFormDisabled] = useState(true);
     const [groups, setGroups] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [users, setUsers] = useState([]);
     const [taskData, setTaskData] = useState({
         id: '',
         priority: '',
@@ -38,15 +39,8 @@ const TaskDetail = () => {
         readSingleTaskData(taskId, setTaskData);
         readGroupsData(setGroups);
         readCategoriesData(setCategories);
+        readAllUsersData(setUsers);
     }, [taskId])
-
-    /*
-    const taskPropertyChangeHandler = (event, propertyName) => {
-        const updatedTask = structuredClone(taskData);
-        updatedTask[propertyName] = event.target.value;
-        setTaskData(updatedTask);
-    };
-    */
 
     const priorityChangeHandler = (event) => {
         setTaskData({ ...taskData, priority: event.target.value });
