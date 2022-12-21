@@ -13,7 +13,7 @@ const NewTaskForm = (props) => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-evenly',
-            minHeight: 450,
+            minHeight: 380,
             mt: 3
         }}>
 
