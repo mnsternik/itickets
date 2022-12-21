@@ -8,8 +8,8 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 const UserTasks = () => {
 
     const userData = useSelector(state => state.auth.userData);
-    const [allUsers, setAllUsers] = useState([]);
     const [filterItem, setFilterItem] = useState({ name: userData.name, value: userData.uid });
+    const [allUsers, setAllUsers] = useState([]);
 
     const [tasks, setTasks] = useState([]);
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector, } from 'react-redux';
-import { readAllTasksData, readGroupsData } from '../lib/api';
+import { readAllTasksData, readAllGroupsData } from '../lib/api';
 
 import TasksTable from './../components/TasksTable/TasksTable';
 import TasksTableActions from './../components/TasksTable/TasksTableActions';
@@ -8,19 +8,19 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 const GroupTasks = () => {
 
     const userGroup = useSelector(state => state.auth.userData.group);
+    const [allGroups, setAllGroups] = useState([]);
+    const [filterItem, setFilterItem] = useState({ name: userGroup, value: userGroup });
 
-    let error; // what to do with this? 
     const [tasks, setTasks] = useState([]);
-    const [groups, setGroups] = useState([]);
 
-    const [filterItem, setFilterItem] = useState(userGroup);
     const [sortingItem, setSortingItem] = useState('Priority');
     const [sortingOrder, setSortingOrder] = useState('Ascending');
 
+    // no need to compare groups by id because there is no 2 groups with the same name 
+    const allGroupsSelectOptions = allGroups.map(group => ({ name: group.name, value: group.name }));
+
     //labels must correspond to tasks properities names
     const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
-
-    const groupsNamesArr = groups.map(group => group.name);
 
     // changes sortingItem to camelCase property name
     const sortingKey = sortingItem
@@ -30,28 +30,31 @@ const GroupTasks = () => {
 
     useEffect(() => {
         readAllTasksData(setTasks);
-        readGroupsData(setGroups)
+        readAllGroupsData(setAllGroups)
     }, [])
 
 
     // open tasks assigned to user's group 
-    const filteredTasks = tasks.filter(task => task.currentGroup === filterItem && (task.status !== 'Canceled' && task.status !== 'Closed'));
+    const filteredTasks = tasks.filter(task => task.currentGroup === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
 
     let sortedTasks = [];
     if (filteredTasks.length) {
 
+        //sorting item is string
         if (typeof filteredTasks[0][sortingKey] === 'string') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])) :
                 filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])).reverse();
         }
 
+        //sorting item is number
         else if (typeof filteredTasks[0][sortingKey] === 'number') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]) :
                 filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]).reverse();
         }
 
+        //sorting item is date
         else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
             sortedTasks = sortingOrder === 'Ascending' ?
                 filteredTasks.sort((a, b) => Date.parse(a[sortingKey]) - Date.parse(b[sortingKey])) :
@@ -78,7 +81,7 @@ const GroupTasks = () => {
             <TasksTableActions
                 labels={labels}
                 filterItem={filterItem}
-                filterOptions={groupsNamesArr}
+                filterOptions={allGroupsSelectOptions}
                 filteredKey='currentGroup'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}
@@ -87,11 +90,12 @@ const GroupTasks = () => {
                 onSortingOrderChange={sortingOrderChangeHandler}
 
             />
+
             <TasksTable
                 tasks={sortedTasks}
-                error={error}
                 labels={labels}
             />
+
         </>
 
     );
