@@ -36,7 +36,6 @@ const DataList = (props) => {
                         <TableCell sx={{ color: 'text.secondary' }}>Name</TableCell>
                         <TableCell sx={{ color: 'text.secondary' }} align="center">Members</TableCell>
                         <TableCell sx={{ color: 'text.secondary' }} align="right">Action</TableCell>
-
                     </TableRow>
                 </TableHead>
                 <TableBody>

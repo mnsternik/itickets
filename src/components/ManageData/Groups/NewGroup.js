@@ -1,16 +1,26 @@
 import { useState } from 'react';
 import { writeNewGroupData } from "../../../lib/api";
 
-import { Box, TextField, Button } from "@mui/material"
+import { Box, TextField, Button, Alert } from "@mui/material"
+import ModalAlert from '../../../UI/ModalAlert';
 
 
 const NewGroup = () => {
 
     const [groupName, setGroupName] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+    const [error, setError] = useState(null);
+
     const isAddButtonDisabled = groupName.trim('') === '';
+    const alertMessage = showAlert ?
+        'New group created.' : 'Something went wrong. Try again later'
 
     const groupNameChangeHandler = (event) => {
         setGroupName(event.target.value)
+    };
+
+    const closeAlertHandler = () => {
+        setShowAlert(false);
     };
 
     const addNewGroupHandler = () => {
@@ -24,10 +34,12 @@ const NewGroup = () => {
             name: groupName,
         };
 
+        //add set error ??
         writeNewGroupData(newGroup);
 
+        setShowAlert(true);
         setGroupName('');
-    }
+    };
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -43,10 +55,21 @@ const NewGroup = () => {
                 variant="contained"
                 disabled={isAddButtonDisabled}
                 onClick={addNewGroupHandler}
-                sx={{ width: 80, height: 40, my: "auto" }}
+                sx={{
+                    width: 80,
+                    height: 40,
+                    my: "auto"
+                }}
             >
                 Add
             </Button>
+
+            {showAlert && <ModalAlert
+                type={error ? 'error' : 'success'}
+                onClose={closeAlertHandler}
+                message={alertMessage}
+            />}
+
         </Box>
     )
 };
