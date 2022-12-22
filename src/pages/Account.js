@@ -17,7 +17,7 @@ const Account = () => {
     const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
     const userData = useSelector(state => state.auth.userData);
 
-    const handleChange = (event) => {
+    const handleChange = () => {
         dispatch(uiActions.toggleDarkMode())
     };
 
