@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 
-import { Box, TextField } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import SelectInput from "../../UI/SelectInput";
 
 
@@ -9,19 +9,12 @@ const NewTaskForm = (props) => {
     const priorities = useSelector(state => state.tasks.priorities);
 
     return (
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-            minHeight: 380,
-            mt: 3
-        }}>
+        <Stack spacing={1}>
 
             <TextField
                 label='Title'
                 value={props.title}
                 onChange={props.onTitleChange}
-                sx={{ mx: 1 }}
             />
 
             <TextField
@@ -30,7 +23,6 @@ const NewTaskForm = (props) => {
                 multiline
                 rows="5"
                 onChange={props.onDescriptionChange}
-                sx={{ mx: 1 }}
             />
 
             <SelectInput
@@ -51,14 +43,8 @@ const NewTaskForm = (props) => {
                 sx={{ width: 180 }}
             />
 
-        </Box>
+        </Stack>
     )
 };
 
 export default NewTaskForm;
-
-/*                error={isTitleInvalid}
-                helperText={isTitleInvalid && 'Cannot be empty.'}
-
-
-*/ 
