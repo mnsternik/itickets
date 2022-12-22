@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { readGroupsData } from '../lib/api';
+import { readAllGroupsData } from '../lib/api';
 
 import DataList from '../components/ManageData/Groups/DataList';
 import NewGroup from '../components/ManageData/Groups/NewGroup';
 
-import { Paper, Divider, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 
 
 const ManageGroupsData = () => {
@@ -12,7 +12,7 @@ const ManageGroupsData = () => {
     const [groupsData, setGroupsData] = useState([]);
 
     useEffect(() => {
-        readGroupsData(setGroupsData);
+        readAllGroupsData(setGroupsData);
     }, [])
 
     return (
@@ -28,8 +28,6 @@ const ManageGroupsData = () => {
             <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                 Groups data manager
             </Typography>
-
-            <Divider />
 
             <DataList groupsData={groupsData} />
 

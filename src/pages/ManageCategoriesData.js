@@ -4,7 +4,7 @@ import { readCategoriesData } from '../lib/api';
 import DataList from '../components/ManageData/Categories/DataList';
 import NewGroup from '../components/ManageData/Categories/NewCategory';
 
-import { Paper, Divider, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 
 
 const ManageCategoriesData = () => {
@@ -28,8 +28,6 @@ const ManageCategoriesData = () => {
             <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                 Categories data manager
             </Typography>
-
-            <Divider />
 
             <DataList categoriesData={categoriesData} />
 

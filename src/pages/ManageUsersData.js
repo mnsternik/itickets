@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { readGroupsData, writeNewUserData } from '../lib/api';
+import { readAllGroupsData } from '../lib/api';
 
 import AddUserForm from '../components/ManageData/Users/AddUserForm';
 
@@ -14,7 +14,7 @@ const ManageUsersData = () => {
     const groupsNamesArr = groups.map(group => group.name);
 
     useEffect(() => {
-        readGroupsData(setGroups);
+        readAllGroupsData(setGroups);
     }, [])
 
     return (
