@@ -36,7 +36,7 @@ const TasksTableActions = (props) => {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            mt: 3
+            mt: 3,
         }}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <SelectInput
@@ -44,6 +44,7 @@ const TasksTableActions = (props) => {
                     options={props.labels}
                     value={props.sortingItem}
                     onChange={sortingItemChangeHandler}
+                    sx={{ mr: 1 }}
                 />
 
                 <SelectInput
