@@ -2,19 +2,18 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { readResponseData, deleteResponse } from '../../lib/api';
 import Response from "./Response"
-import { Box, Button } from "@mui/material"
+import { Stack, Button } from "@mui/material"
 
 
 const ResponsesList = (props) => {
 
-    const { taskData } = props;
-
     const params = useParams();
     const { taskId } = params;
 
-    const [showResponsesList, setShowResponsesList] = useState(false);
-    const [responses, setResponses] = useState([]);
+    const { taskData } = props;
 
+    const [responses, setResponses] = useState([]);
+    const [showResponsesList, setShowResponsesList] = useState(false);
 
     useEffect(() => {
         readResponseData(taskId, setResponses);
@@ -37,29 +36,32 @@ const ResponsesList = (props) => {
         responsesList = responses.map(response => (
             <Response
                 key={response.id}
-                resId={response.id}
-                resAuthor={response.author}
+                responseId={response.id}
+                responseAuthor={response.author}
+                responseAuthorId={response.authorId}
                 createDate={response.createDate}
                 message={response.message}
                 visibility={response.visibility}
-                taskAuthor={taskData.author}
+                taskAuthorId={taskData.authorId}
                 taskId={taskData.id}
                 onDelete={deleteResponseHandler}
             />
         ));
-
     }
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Button onClick={toggleResponsesList} disabled={!responses.length}>
+        <Stack spacing={3}>
+
+            <Button
+                onClick={toggleResponsesList}
+                disabled={!responses.length}
+            >
                 {showResponsesList ? 'Hide responses' : `Show responses (${responses.length})`}
             </Button>
 
             {showResponsesList && responsesList}
-        </Box>
 
-
+        </Stack>
     )
 };
 

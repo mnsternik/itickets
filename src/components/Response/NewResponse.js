@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { writeNewResponseData, updateSingleTaskData } from '../../lib/api';
 
-import { Button, Box, TextField, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
-//import SelectInput from '../../../UI/SelectInput';
+import { Button, TextField, Stack } from '@mui/material';
+import SelectInput from '../../UI/SelectInput';
 
 const NewResponse = (props) => {
 
     const [responseInputValue, setResponseInputValue] = useState('');
-    const [isResponsePrivate, setIsResponsePrivate] = useState('Public');
+    const [responseType, setResponseType] = useState('Public');
 
-    const username = useSelector(state => state.auth.username);
+    const userData = useSelector(state => state.auth.userData);
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
         day: 'numeric',
@@ -22,7 +22,7 @@ const NewResponse = (props) => {
 
 
     const isResPrivateChangeHandler = (event) => {
-        setIsResponsePrivate(event.target.value);
+        setResponseType(event.target.value);
     };
 
     const responseChangeHandler = (event) => {
@@ -31,15 +31,16 @@ const NewResponse = (props) => {
 
 
     const addResponseClickHandler = () => {
-        let updatedTask = structuredClone(props.taskData);
+        const updatedTask = structuredClone(props.taskData);
+        updatedTask.modificationDate = dateFormatter.format(new Date());
+
         const responseData = {
-            author: username,
+            author: userData.name,
+            authorId: userData.uid,
             createDate: dateFormatter.format(new Date()),
             message: responseInputValue,
-            visibility: isResponsePrivate
+            visibility: responseType
         };
-
-        updatedTask.modificationDate = dateFormatter.format(new Date());
 
         writeNewResponseData(updatedTask.id, responseData)
         updateSingleTaskData(updatedTask);
@@ -49,23 +50,14 @@ const NewResponse = (props) => {
 
 
     return (
-        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-
-            <FormControl sx={{ width: '140px', my: 2, alignSelf: 'flex-end' }}>
-                <InputLabel id="input-response-type-label"> Visibility </InputLabel>
-                <Select
-                    labelId="response-type-label"
-                    size="small"
-                    id="response-type"
-                    value={isResponsePrivate}
-                    label="Visibility"
-                    onChange={isResPrivateChangeHandler}
-                    sx={{ w: 120 }}
-                >
-                    <MenuItem value={'Private'}>Private</MenuItem>
-                    <MenuItem value={'Public'}>Public</MenuItem>
-                </Select>
-            </FormControl>
+        <Stack spacing={2} sx={{ mt: 3 }}>
+            <SelectInput
+                label='Visibility'
+                value={responseType}
+                onChange={isResPrivateChangeHandler}
+                options={['Private', 'Public']}
+                sx={{ width: 120, alignSelf: 'end' }}
+            />
 
             <TextField
                 label="Response"
@@ -77,16 +69,15 @@ const NewResponse = (props) => {
             />
 
             <Button
-                variant="outlined"
+                variant="contained"
                 size='large'
+                disabled={!responseInputValue.length}
                 onClick={addResponseClickHandler}
-                sx={{ m: 2, width: 80 }}
+                sx={{ width: 80 }}
             >
                 Send
             </Button>
-
-        </Box>
-
+        </Stack>
     )
 }
 

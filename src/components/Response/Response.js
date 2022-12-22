@@ -7,49 +7,55 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const Response = (props) => {
 
     const {
-        resAuthor,
-        taskAuthor,
-        resId,
+        responseAuthor,
+        responseAuthorId,
+        taskAuthorId,
+        responseId,
         taskId,
         createDate,
         visibility,
         message
     } = props;
 
+    const userData = useSelector(state => state.auth.userData);
 
-    const user = useSelector(state => state.auth.username);
     // private response is visiable only to the author of task and author of response
-    const showResponse = visibility === 'Public' || (visibility === 'Private' && (taskAuthor === user || resAuthor === user))
+    const showResponse = visibility === 'Public' || (taskAuthorId === userData.uid || responseAuthorId === userData.uid);
 
-    const deleteResponseHandler = (event) => {
-        props.onDelete(taskId, resId);
-    }
+    const showDeleteIcon = userData.uid === responseAuthorId;
+
+    const deleteResponseHandler = () => {
+        props.onDelete(taskId, responseId);
+    };
 
     return (
         <Paper sx={{
             display: 'flex',
             flexDirection: 'column',
-            p: 2,
-            pt: 1,
-            my: 2
+            p: 3
         }}>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                    <Typography variant='subtitle2' sx={{ fontWeight: 'light', mb: 2 }}> {resAuthor}, {createDate} </Typography>
-                    <Typography variant='subtitle2' sx={{ fontWeight: 'bold', mb: 2, pl: 2 }}> {visibility} </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
 
-                </Box>
-                <Box>
-                    <IconButton aria-label="delete" onClick={deleteResponseHandler} sx={{ alignSelf: 'flex-end' }} >
-                        <DeleteIcon />
-                    </IconButton>
-                </Box>
+                <Typography
+                    variant='subtitle2'
+                    sx={{ fontWeight: 'light', mb: 2 }}
+                >
+                    {responseAuthor}, {createDate} | <strong>{visibility}</strong>
+                </Typography>
+
+                {showDeleteIcon && <IconButton onClick={deleteResponseHandler} sx={{ left: 20, bottom: 20 }}>
+                    <DeleteIcon />
+                </IconButton>}
+
             </Box>
 
-            <Typography variant='subtitle1'>{showResponse ? message : '[Private response]'}</Typography>
+            <Typography variant='subtitle1'>
+                {showResponse ? message : '[Private response]'}
+            </Typography>
+
         </Paper>
     )
-}
+};
 
 export default Response; 
