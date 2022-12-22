@@ -60,7 +60,7 @@ const TaskDetailActions = (props) => {
     };
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', mb: 1 }}>
 
             <Button size='large' sx={{ width: '90px' }} onClick={() => navigate(-1)}>
                 Back

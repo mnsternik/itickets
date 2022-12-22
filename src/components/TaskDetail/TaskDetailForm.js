@@ -1,45 +1,68 @@
 import { useSelector } from 'react-redux';
 
-import { TextField, Box, Typography } from '@mui/material';
+import { TextField, Stack } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import SelectInput from "../../UI/SelectInput";
-
-const DUMMY_USERS = ['user1', 'user2', 'user3', 'None'];
 
 const TaskDetailForm = (props) => {
 
     const priorities = useSelector(state => state.tasks.priorities);
 
-    const { groups, categories } = props;
+    const { groups, categories, users } = props;
+
+    const currentUserOptionValue = users.find(user => user.value === props.taskData.currentUserId);
 
     return (
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-            minHeight: 500
-        }}>
 
-            <Typography variant='h5' sx={{ my: 1 }}>
-                [ID: {props.taskData.id}] - {props.taskData.title}
-            </Typography>
+        <Stack spacing={2} sx={{ my: 6 }}>
 
-            <Typography variant='subtitle1' sx={{ fontWeight: 'light', mb: 2 }}>
-                Author: {props.taskData.author}
-            </Typography>
+            <TextField
+                label="Title"
+                value={props.taskData.title ? props.taskData.title : ''}
+                inputProps={{ readOnly: true }}
+            />
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', my: 1 }}>
-                <SelectInput
-                    label='Category'
-                    options={categories}
-                    onChange={props.onCategoryChange}
-                    defaultValue=''
-                    value={props.taskData.category}
+            <TextField
+                label="Description"
+                inputProps={{ readOnly: props.isFormDisabled }}
+                multiline
+                rows={6}
+                value={props.taskData.description}
+                sx={{ my: 1 }}
+            />
 
-                    inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
+            <Stack direction="row" spacing={3}>
+
+                <TextField
+                    label="ID"
+                    value={props.taskData.id}
+                    inputProps={{ readOnly: true }}
+                    sx={{ width: 70 }}
                 />
+
+                <TextField
+                    label="Author"
+                    value={props.taskData.author}
+                    inputProps={{ readOnly: true }}
+                />
+
+                <TextField
+                    label="Creation date"
+                    value={props.taskData.createDate}
+                    inputProps={{ readOnly: true }}
+                />
+
+                <TextField
+                    label="Last modification date"
+                    value={props.taskData.modificationDate}
+                    inputProps={{ readOnly: true }}
+
+                />
+
+            </Stack>
+
+            <Stack direction="row" spacing={3}>
 
                 <SelectInput
                     label='Status'
@@ -47,7 +70,16 @@ const TaskDetailForm = (props) => {
                     value={props.taskData.status}
                     options={['Open', 'In progress', 'Closed', 'Canceled']}
                     inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
+                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                />
+
+                <SelectInput
+                    label='Category'
+                    options={categories}
+                    onChange={props.onCategoryChange}
+                    value={categories.length ? props.taskData.category : ''}
+                    inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
                 />
 
                 <SelectInput
@@ -57,62 +89,36 @@ const TaskDetailForm = (props) => {
                     structure='objects'
                     options={priorities}
                     inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
+                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
                 />
-            </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', my: 1 }}>
-                <SelectInput
-                    label='Current user'
-                    onChange={props.onCurrentUserChange}
-                    value={props.taskData.currentUser || 'None'}
-                    options={DUMMY_USERS}
-                    inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
-                />
+            </Stack>
+
+            <Stack direction="row" spacing={3}>
 
                 <SelectInput
                     label='Current group'
                     onChange={props.onCurrentGroupChange}
-                    value={props.taskData.currentGroup}
+                    value={groups.length ? props.taskData.currentGroup : ''}
                     options={groups}
                     inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? null : ArrowDropDownIcon}
-
-                />
-            </Box>
-
-            <TextField
-                label="Description"
-                inputProps={{ readOnly: props.isFormDisabled }}
-                multiline
-                rows={4}
-                value={props.taskData.description}
-                sx={{ my: 1 }}
-            />
-
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                my: 1
-            }}>
-                <TextField
-                    label="Creation date"
-                    value={props.taskData.createDate}
-                    inputProps={{ readOnly: true }}
-                    sx={{ width: 300, px: 1 }}
-
+                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
                 />
 
-                <TextField
-                    label="Last modification date"
-                    value={props.taskData.modificationDate}
-                    inputProps={{ readOnly: true }}
-                    sx={{ width: 300, px: 1 }}
+                <SelectInput
+                    label='Current user'
+                    structure='objects'
+                    value={currentUserOptionValue ? currentUserOptionValue.value : ''}
+                    options={users}
+                    onChange={props.onCurrentUserChange}
+                    inputProps={{ readOnly: props.isFormDisabled }}
+                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                    sx={{ minWidth: 140 }}
                 />
-            </Box>
-        </Box>
+
+            </Stack>
+
+        </Stack>
     )
 };
 
