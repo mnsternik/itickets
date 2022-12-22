@@ -3,7 +3,7 @@ import { writeNewUserData } from "../../../lib/api";
 
 import SelectInput from "../../../UI/SelectInput"
 
-import { TextField, Box, Typography, Button } from "@mui/material"
+import { TextField, Box, Typography, Button, Stack, Paper } from "@mui/material"
 
 
 const AddUserForm = (props) => {
@@ -92,17 +92,16 @@ const AddUserForm = (props) => {
     };
 
     return (
-        <Box elevaion={3}>
+        <Box sx={{ p: 3 }}>
 
-            <Typography variant="subtitle1" sx={{ my: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Create new user
             </Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', minHeight: 480 }}>
-
+            <Stack spacing={1}>
                 <TextField
                     label="Name"
-                    sx={{ mx: 1, width: 320 }}
+                    sx={{ width: 320 }}
                     value={name}
                     onChange={nameInputChangeHandler}
                 />
@@ -111,7 +110,7 @@ const AddUserForm = (props) => {
                     label="E-Mail"
                     value={email}
                     onChange={emailInputChangeHandler}
-                    sx={{ mx: 1, width: 320 }}
+                    sx={{ width: 320 }}
                 />
 
                 <SelectInput
@@ -128,7 +127,7 @@ const AddUserForm = (props) => {
                     type="password"
                     value={password}
                     onChange={passwordInputChangeHandler}
-                    sx={{ mx: 1, width: 320 }}
+                    sx={{ width: 320 }}
 
                 />
 
@@ -137,22 +136,23 @@ const AddUserForm = (props) => {
                     type="password"
                     value={repeatedPassword}
                     onChange={repeatedPasswordInputChangeHandler}
-                    sx={{ mx: 1, width: 320 }}
+                    sx={{ width: 320 }}
                 />
+            </Stack>
 
-                {error && <Typography variant="subtitle1" sx={{ my: 2, color: 'error.main' }}>
-                    {error}
-                </Typography>}
+            {error && <Typography variant="subtitle1" sx={{ mt: 2, color: 'error.main' }}>
+                {error}
+            </Typography>}
 
-                <Button
-                    variant='contained'
-                    sx={{ m: 1, width: 180 }}
-                    onClick={addUserHandler}
-                >
-                    Add user
-                </Button>
+            <Button
+                variant='contained'
+                size='large'
+                sx={{ width: 120, mt: 2 }}
+                onClick={addUserHandler}
+            >
+                Add user
+            </Button>
 
-            </Box>
         </Box>
     )
 };
