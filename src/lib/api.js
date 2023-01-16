@@ -4,6 +4,10 @@ import { db, auth } from '../util/firebase';
 
 //add check if data exists (for example 2 groups with same name? 
 
+
+// ------------  AUTH --------------
+
+
 export function writeNewUserData(userData, password, setError) {
     createUserWithEmailAndPassword(auth, userData.email, password)
         .then((userCredential) => {
@@ -11,10 +15,11 @@ export function writeNewUserData(userData, password, setError) {
             const newUserRef = ref(db, '/users/' + uid);
             const updatedUserData = { ...userData, uid: uid };
             set(newUserRef, updatedUserData);
+            writeNewGroupMember(userData.group, uid);
         })
         .catch((error) => {
             if (error.code === 'auth/email-already-in-use') {
-                setError('E-mail already in use.')
+                setError('E-mail already in use')
             } else if (error.code === 'auth/weak-password') {
                 setError('Password must be at least 6 characters long')
             } else {
@@ -23,74 +28,88 @@ export function writeNewUserData(userData, password, setError) {
         });
 };
 
-export function signUserOut() {
-    signOut(auth)
-};
 
-export function signInUser(email, password, setError) {
+export function signUserIn(email, password, dispatchUserData, setError, navigate) {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             return userCredential.user.uid;
         })
+        .then((uid) => {
+            // find user data in db with uid returned from firebase auth 
+            onValue(ref(db, '/users/' + uid), (snapshot) => {
+                dispatchUserData(snapshot.val());
+            });
+        })
+        .then(() => {
+            // navigate logged user to /user-tasks route
+            navigate();
+        })
         .catch((error) => {
-            console.log(error.code);
-            setError("Incorrect login data.");
+            if (error.code === 'auth/invalid-email') {
+                setError('Invalid e-mail address')
+            } else if (error.code === 'auth/user-not-found') {
+                setError('User not found')
+            } else if (error.code === 'auth/wrong-password') {
+                setError('Wrong password')
+            } else {
+                setError("Authentication error");
+            }
         });
 };
+
+
+export function signUserOut() {
+    signOut(auth)
+};
+
+
+
+// ------------  USERS DATA --------------
+
 
 export function readUserData(uid, updateUser) {
     const userRef = ref(db, '/users/' + uid);
     onValue(userRef, (snapshot) => {
         const userData = snapshot.val();
-        console.log(userData);
         updateUser(userData);
     });
 };
+
 
 export function readAllUsersData(updateUsers) {
     const usersRef = ref(db, 'users');
     onValue(usersRef, (snapshot) => {
         const usersData = snapshot.val();
-        console.log(usersData);
-        updateUsers(usersData);
+        const transformedUsers = [];
+        for (const userKey in usersData) {
+            transformedUsers.push(usersData[userKey])
+        }
+        updateUsers(transformedUsers);
     });
 };
 
 
-export function writeNewResponseData(taskId, responseData) {
-    const newResponseRef = push(child(ref(db), '/responses/' + taskId));
-    const newResponseKey = newResponseRef.key;
 
-    set(newResponseRef, { ...responseData, id: newResponseKey })
+// ------------  TASKS DATA --------------
+
+
+export function readNewTaskId(setNewTaskId) {
+    const tasksRef = ref(db, 'tasks');
+    return onValue(tasksRef, (snapshot) => {
+        if (!snapshot.val()) {
+            setNewTaskId('T1');
+            return;
+        }
+        const newTaskId = Object.keys(snapshot.val()).length + 1;
+        setNewTaskId('T' + newTaskId);
+    });
 };
 
 
 export function writeNewTaskData(taskData) {
     const newTaskRef = ref(db, '/tasks/' + taskData.id);
+    writeNewCategoryMember(taskData.category, taskData.id);
     set(newTaskRef, taskData);
-};
-
-
-export function writeNewGroupData(groupData) {
-    const newGroupRef = ref(db, '/groups/' + groupData.id);
-    set(newGroupRef, groupData);
-};
-
-
-export function writeNewGroupMember(groupName, userId) {
-    const groupId = groupName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
-    const newMemberRef = ref(db, '/groups/' + groupId + '/members');
-    push(newMemberRef, userId);
-};
-
-
-export function writeCategoryData(category) {
-    const newCategoryRef = ref(db, '/categories/' + category.id);
-    set(newCategoryRef, category)
 };
 
 
@@ -108,7 +127,6 @@ export function readAllTasksData(updateTasks) {
         for (const taskKey in fetchedTasks) {
             transformedTasks.push(fetchedTasks[taskKey])
         }
-
         updateTasks(transformedTasks);
     });
 };
@@ -123,6 +141,17 @@ export function readSingleTaskData(taskId, updateTask) {
 };
 
 
+
+// ------------  RESPONSES DATA -------------- 
+
+
+export function writeNewResponseData(taskId, responseData) {
+    const newResponseRef = push(child(ref(db), '/responses/' + taskId));
+    const newResponseKey = newResponseRef.key;
+    set(newResponseRef, { ...responseData, id: newResponseKey })
+};
+
+
 export function readResponseData(taskId, updateResponses) {
     const responsesRef = ref(db, '/responses/' + taskId);
     return onValue(responsesRef, (snapshot) => {
@@ -131,28 +160,28 @@ export function readResponseData(taskId, updateResponses) {
         for (const resKey in fetchedResponses) {
             transformedResponses.push(fetchedResponses[resKey])
         }
-
         updateResponses(transformedResponses);
     })
 };
 
 
-export function readCategoriesData(updateCategories) {
-    const categoriesRef = ref(db, 'categories');
-    onValue(categoriesRef, (snapshot) => {
-        const categories = snapshot.val();
-        const transformedCategories = [];
-        for (let categoryKey in categories) {
-            transformedCategories.push(categories[categoryKey]);
-        }
-
-        updateCategories(transformedCategories);
-    });
+export function deleteResponse(taskId, responseKey) {
+    const responseRef = ref(db, '/responses/' + taskId + '/' + responseKey);
+    set(responseRef, null)
 };
 
 
 
-export function readGroupsData(updateGroups) {
+// ------------  GROUPS DATA -------------- 
+
+
+export function writeNewGroupData(groupData) {
+    const newGroupRef = ref(db, '/groups/' + groupData.id);
+    set(newGroupRef, groupData);
+};
+
+
+export function readAllGroupsData(updateGroups) {
     const groupsRef = ref(db, 'groups');
     onValue(groupsRef, (snapshot) => {
         const groups = snapshot.val();
@@ -160,7 +189,6 @@ export function readGroupsData(updateGroups) {
         for (let groupKey in groups) {
             transformedGroups.push(groups[groupKey]);
         }
-
         updateGroups(transformedGroups);
     });
 };
@@ -179,33 +207,96 @@ export function readSingleGroupData(groupName) {
 };
 
 
-export function readNewTaskId(setNewTaskId) {
-    const tasksRef = ref(db, 'tasks');
-    return onValue(tasksRef, (snapshot) => {
-        if (!snapshot.val()) {
-            setNewTaskId('T1');
-            return;
-        }
-
-        const newTaskId = Object.keys(snapshot.val()).length + 1;
-        setNewTaskId('T' + newTaskId);
-    });
-};
-
-
-export function deleteResponse(taskId, responseKey) {
-    const responseRef = ref(db, '/responses/' + taskId + '/' + responseKey);
-    set(responseRef, null)
-};
-
-
 export function deleteGroup(groupId) {
     const groupRef = ref(db, '/groups/' + groupId);
     set(groupRef, null)
 };
 
+
+export function writeNewGroupMember(groupName, userId) {
+    const groupId = groupName
+        .split(' ')
+        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
+        .join('');
+
+    const newMemberRef = ref(db, '/groups/' + groupId + '/members');
+    push(newMemberRef, userId);
+};
+
+
+export function readGroupMembers(groupName, setMembers) {
+    const groupId = groupName
+        .split(' ')
+        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
+        .join('');
+
+    const groupRef = ref(db, '/groups/' + groupId);
+    onValue(groupRef, (snapshot) => {
+        const members = snapshot.val();
+        const transformedMembers = [];
+        for (const taskKey in members) {
+            transformedMembers.push(members[taskKey])
+        }
+        setMembers(transformedMembers);
+    });
+};
+
+
+
+// ------------  CATEGORIES DATA -------------- 
+
+
+export function writeCategoryData(category) {
+    const newCategoryRef = ref(db, '/categories/' + category.id);
+    set(newCategoryRef, category)
+};
+
+
+export function readCategoriesData(updateCategories) {
+    const categoriesRef = ref(db, 'categories');
+    onValue(categoriesRef, (snapshot) => {
+        const categories = snapshot.val();
+        const transformedCategories = [];
+        for (let categoryKey in categories) {
+            transformedCategories.push(categories[categoryKey]);
+        }
+        updateCategories(transformedCategories);
+    });
+};
+
+
 export function deleteCategory(categoryId) {
     const categoriesRef = ref(db, '/categories/' + categoryId);
     set(categoriesRef, null)
 };
+
+
+export function writeNewCategoryMember(categoryName, taskId) {
+    const categoryId = categoryName
+        .split(' ')
+        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
+        .join('');
+
+    const newMemberRef = ref(db, '/categories/' + categoryId + '/members');
+    push(newMemberRef, taskId);
+};
+
+
+export function readCategoryMembers(categoryName, setMembers) {
+    const categoryId = categoryName
+        .split(' ')
+        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
+        .join('');
+
+    const categoryRef = ref(db, '/categories/' + categoryId);
+    onValue(categoryRef, (snapshot) => {
+        const members = snapshot.val();
+        const transformedMembers = [];
+        for (const categoryKey in members) {
+            transformedMembers.push(members[categoryKey])
+        }
+        setMembers(transformedMembers);
+    });
+};
+
 
