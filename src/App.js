@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
-import { Routes, Route } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux/es/exports";
-import { fetchCategoriesData, fetchTasksData } from './store/tasks';
-import { fetchGroupsData } from './store/users';
+import React from 'react';
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
+import NotFound from './pages/NotFound';
+import SignIn from './pages/SignIn';
+import SignOut from './pages/SignOut';
 import Sidebar from './components/Sidebar/Sidebar';
 import NewTask from './pages/NewTask';
 import GroupTasks from './pages/GroupTasks';
@@ -15,11 +16,9 @@ import ManageCategoriesData from './pages/ManageCategoriesData';
 import ManageGroupsData from './pages/ManageGroupsData';
 import ManageUsersData from './pages/ManageUsersData';
 import Account from './pages/Account';
-import NotFound from './pages/NotFound';
 
 import { ThemeProvider, createTheme, Container, CssBaseline } from '@mui/material';
 import './App.css';
-
 
 const darkTheme = createTheme({
   palette: {
@@ -33,50 +32,48 @@ const lightTheme = createTheme({
   },
 });
 
-let isInitial = true;
+const PrivateRoutes = () => {
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  return (
+    isLoggedIn ? <Outlet /> : <Navigate to='/sign-in' />
+  )
+};
 
-function App() {
 
-  const dispatch = useDispatch();
+const App = () => {
 
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
-
   const theme = isDarkModeEnabled ? darkTheme : lightTheme;
-
-  //              <Suspense fallback={<CircularProgress />}>
-  //const NewTask = React.lazy(() => import('./newtask'));
-
-
-  useEffect(() => {
-    if (isInitial) {
-      dispatch(fetchCategoriesData());
-      dispatch(fetchTasksData());
-      dispatch(fetchGroupsData());
-      isInitial = false;
-    }
-  }, [dispatch]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline>
         <div className="App">
-          <Sidebar />
+          {isLoggedIn && <Sidebar />}
           <Container maxWidth="lg">
+
             <Routes>
+              <Route element={<PrivateRoutes />}>
+                <Route path='/' element={<UserTasks />} />
+                <Route path='/sign-out' element={<SignOut />} />
+                <Route path='/newtask' element={<NewTask />} />
+                <Route path='/user-tasks' element={<UserTasks />} />
+                <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
+                <Route path='/group-tasks' element={<GroupTasks />} />
+                <Route path='/tasks/:taskId' element={<TaskDetail />} />
+                <Route path='/search' element={<Search />} />
+                <Route path='/account' element={<Account />} />
+                <Route path='/manage-categories' element={<ManageCategoriesData />} />
+                <Route path='/manage-groups' element={<ManageGroupsData />} />
+                <Route path='/manage-users' element={<ManageUsersData />} />
+                <Route path='*' element={<NotFound />} />
+              </Route>
 
-              <Route path='/newtask' element={<NewTask />} />
-              <Route path='/' element={<UserTasks />} />
-              <Route path='/user-tasks' element={<UserTasks />} />
-              <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
-              <Route path='/group-tasks' element={<GroupTasks />} />
-              <Route path='/tasks/:taskId' element={<TaskDetail />} />
-              <Route path='/search' element={<Search />} />
-              <Route path='/manage-categories' element={<ManageCategoriesData />} />
-              <Route path='/manage-groups' element={<ManageGroupsData />} />
+              <Route path='/sign-in' element={<SignIn />} />
 
-              <Route path='/account' element={<Account />} />
-              <Route path='*' element={<NotFound />} />
             </Routes>
+
           </Container>
         </div>
       </CssBaseline>
@@ -85,3 +82,7 @@ function App() {
 }
 
 export default App;
+
+
+  //<Suspense fallback={<CircularProgress />}>
+  //const NewTask = React.lazy(() => import('./newtask'));
