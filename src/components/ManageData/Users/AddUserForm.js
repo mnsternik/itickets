@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { writeNewUserData } from "../../../lib/api";
+import { writeNewGroupMember, writeNewUserData } from "../../../lib/api";
 
 import SelectInput from "../../../UI/SelectInput"
 
-import { TextField, Box, Typography, Button, Stack, Paper } from "@mui/material"
+import { TextField, Typography, Button, Stack, Paper } from "@mui/material"
 
 
 const AddUserForm = (props) => {
@@ -47,12 +47,11 @@ const AddUserForm = (props) => {
             setError('All data must be filled');
             return false;
         } else if (password.length < 6) {
-            setError('Password must be at least 6 characters long.')
+            setError('Password must be at least 6 characters long')
             return false;
         } else if (password !== repeatedPassword) {
-            setError('Passwords are not the same.')
+            setError('Passwords are not the same')
             return false;
-
         } else if (!email.includes('@')) {
             setError('Wrong E-mail address')
             return false;
@@ -92,16 +91,16 @@ const AddUserForm = (props) => {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Stack spacing={3}>
 
-            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+            <Typography variant={'h6'}>
                 Create new user
             </Typography>
 
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ width: 420 }}>
+
                 <TextField
                     label="Name"
-                    sx={{ width: 320 }}
                     value={name}
                     onChange={nameInputChangeHandler}
                 />
@@ -110,7 +109,6 @@ const AddUserForm = (props) => {
                     label="E-Mail"
                     value={email}
                     onChange={emailInputChangeHandler}
-                    sx={{ width: 320 }}
                 />
 
                 <SelectInput
@@ -119,7 +117,6 @@ const AddUserForm = (props) => {
                     defaultValue={''}
                     value={group}
                     onChange={groupSelectChangeHandler}
-                    sx={{ width: 320 }}
                 />
 
                 <TextField
@@ -127,8 +124,6 @@ const AddUserForm = (props) => {
                     type="password"
                     value={password}
                     onChange={passwordInputChangeHandler}
-                    sx={{ width: 320 }}
-
                 />
 
                 <TextField
@@ -136,24 +131,24 @@ const AddUserForm = (props) => {
                     type="password"
                     value={repeatedPassword}
                     onChange={repeatedPasswordInputChangeHandler}
-                    sx={{ width: 320 }}
                 />
+
             </Stack>
 
-            {error && <Typography variant="subtitle1" sx={{ mt: 2, color: 'error.main' }}>
+            {error && <Typography variant="subtitle1" sx={{ color: 'error.main' }}>
                 {error}
             </Typography>}
 
             <Button
                 variant='contained'
                 size='large'
-                sx={{ width: 120, mt: 2 }}
+                sx={{ width: 120 }}
                 onClick={addUserHandler}
             >
                 Add user
             </Button>
 
-        </Box>
+        </Stack>
     )
 };
 

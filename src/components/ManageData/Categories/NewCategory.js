@@ -25,9 +25,8 @@ const NewCategory = () => {
         };
 
         writeCategoryData(newCategory);
-
         setCategoryName('');
-    }
+    };
 
     return (
         <Box sx={{ display: 'flex' }}>

@@ -36,7 +36,7 @@ const TasksTableActions = (props) => {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            mt: 3,
+            mb: 2,
         }}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <SelectInput

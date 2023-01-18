@@ -1,15 +1,9 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { authActions } from '../store/auth';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { onValue, ref } from 'firebase/database';
-import { auth, db } from '../util/firebase';
+import { signUserIn } from '../lib/api';
 
-import { Paper, TextField, Button, Typography } from "@mui/material"
+import { Paper, TextField, Button, Typography, Divider } from "@mui/material"
 
 const SignIn = () => {
-
-    const dispatch = useDispatch();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,45 +18,24 @@ const SignIn = () => {
     };
 
     const signInHandler = () => {
-
         if (email.trim() === '' || password.trim() === '') {
             setError('Incorecct login data.')
-        };
-
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                return userCredential.user.uid;
-            })
-            .then((uid) => {
-                // find user data in db with uid returned from firebase auth 
-                onValue(ref(db, '/users/' + uid), (snapshot) => {
-                    dispatch(authActions.signIn(snapshot.val()))
-                });
-            })
-            .catch((error) => {
-                if (error.code === 'auth/invalid-email') {
-                    setError('Invalid e-mail address.')
-                } else if (error.code === 'auth/user-not-found') {
-                    setError('User not found.')
-                } else if (error.code === 'auth/wrong-password') {
-                    setError('Wrong password')
-                } else {
-                    setError("Authentication error.");
-                }
-            });
+            return;
+        }
+        signUserIn(email, password, setError);
     };
 
     return (
-        <Paper sx={{
-            minHeight: 340,
-            width: 400,
-            p: 4,
-            mt: 6,
-            mx: 'auto',
+        <Paper elevation={2} sx={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-evenly',
-            alignItems: 'center'
+            alignItems: 'center',
+            minHeight: 440,
+            width: 600,
+            p: 2,
+            mx: 'auto',
+            mt: 6,
         }}>
 
             <Typography variant="h5" sx={{ mx: 'auto', mb: 2 }}>
@@ -84,9 +57,11 @@ const SignIn = () => {
                 sx={{ width: 240 }}
             />
 
-            {error && <Typography variant="subtitle1" sx={{ my: 2, color: 'error.main' }}>
+            {error && <Typography variant="subtitle1" sx={{ color: 'error.main' }}>
                 {error}
             </Typography>}
+
+
 
             <Button
                 variant="contained"
@@ -95,6 +70,14 @@ const SignIn = () => {
             >
                 Login
             </Button>
+
+            <Divider />
+
+            <Typography variant="subtitle2" sx={{ fontWeight: 200 }}>
+                In case of problem, contact our Helpdesk: <br />
+                Phone number: (+48 123-456-789) <br />
+                E-Mail: example@mail.com
+            </Typography>
 
         </Paper>
     )

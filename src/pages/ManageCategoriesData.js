@@ -4,7 +4,7 @@ import { readCategoriesData } from '../lib/api';
 import DataList from '../components/ManageData/Categories/DataList';
 import NewGroup from '../components/ManageData/Categories/NewCategory';
 
-import { Paper, Typography } from '@mui/material';
+import { Paper, Stack, Typography } from '@mui/material';
 
 
 const ManageCategoriesData = () => {
@@ -16,24 +16,17 @@ const ManageCategoriesData = () => {
     }, [])
 
     return (
-        <Paper
-            sx={{
-                minHeight: '500px',
-                p: 4,
-                my: 4,
-                display: 'flex',
-                flexDirection: 'column',
-            }}>
+        <Stack>
+            <Paper sx={{ p: 4 }}>
+                <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
+                    Categories data manager
+                </Typography>
 
-            <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
-                Categories data manager
-            </Typography>
+                <DataList categoriesData={categoriesData} />
 
-            <DataList categoriesData={categoriesData} />
-
-            <NewGroup />
-
-        </Paper>
+                <NewGroup />
+            </Paper>
+        </Stack>
     );
 };
 

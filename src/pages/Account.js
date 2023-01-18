@@ -6,7 +6,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/system/Box';
+import { Stack } from '@mui/system';
+import { TextField } from '@mui/material';
 
 import { uiActions } from '../store/ui';
 
@@ -22,49 +23,58 @@ const Account = () => {
     };
 
     return (
-        <Paper
-            component='form'
-            sx={{
-                minHeight: '500px',
-                p: 4,
-                my: 4,
-                display: 'flex',
-                flexDirection: 'column',
-            }}>
+        <Paper sx={{ p: 3 }}>
 
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: 100,
-                justifyContent: 'space-between',
-                mb: 5,
-            }}>
+            <Stack spacing={4}>
+
                 <Typography variant='h5'>
-                    User info
+                    User informations
                 </Typography>
-                <Typography variant='body1'>
-                    Username: {userData.name}
-                </Typography>
-                <Typography variant='body1'>
-                    Group: {userData.group}
-                </Typography>
-                <Typography variant='body1'>
-                    E-mail: {userData.email}
-                </Typography>
-            </Box>
 
-            <Typography variant='h5'>
-                Apperance
-            </Typography>
-            <FormControl component="fieldset" variant="standard" sx={{ m: 2 }} >
-                <FormLabel component="legend">{isDarkModeEnabled ? 'Enabled' : 'Disabled'}</FormLabel>
-                <FormControlLabel
-                    control={
-                        <Switch checked={isDarkModeEnabled} onChange={handleChange} name="darkMode" />
-                    }
-                    label="Dark Mode"
-                />
-            </FormControl>
+                <Stack spacing={2} sx={{ width: 320 }}>
+
+                    <TextField
+                        label='Username'
+                        value={userData.name}
+                        inputProps={{ readOnly: true }}
+                    />
+
+                    <TextField
+                        label='E-mail'
+                        value={userData.email}
+                        inputProps={{ readOnly: true }}
+                    />
+
+                    <TextField
+                        label='Group'
+                        value={userData.group}
+                        inputProps={{ readOnly: true }}
+                    />
+
+                </Stack>
+
+                <Typography variant='h5'>
+                    Apperance
+                </Typography>
+
+                <FormControl
+                    component="fieldset"
+                    variant="standard"
+                    sx={{ m: 2 }}
+                >
+
+                    <FormLabel component="legend">{isDarkModeEnabled ? 'Enabled' : 'Disabled'}</FormLabel>
+                    <FormControlLabel
+                        label="Dark Mode"
+                        control={
+                            <Switch checked={isDarkModeEnabled} onChange={handleChange} name="darkMode" />
+                        }
+                    />
+
+                </FormControl>
+
+            </Stack>
+
         </Paper>
     );
 };

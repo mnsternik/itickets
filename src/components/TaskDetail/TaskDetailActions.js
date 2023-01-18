@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import { updateSingleTaskData } from '../../lib/api';
+
+import ModalAlert from '../../UI/ModalAlert';
+
 import { Box, Button, Alert } from "@mui/material";
 
 const TaskDetailActions = (props) => {
@@ -44,6 +47,9 @@ const TaskDetailActions = (props) => {
         props.onToggleFormChangeable();
     };
 
+    const closeAlertHandler = () => {
+        setShowSuccesAlert(false);
+    };
 
     const saveClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
@@ -53,7 +59,6 @@ const TaskDetailActions = (props) => {
         updateSingleTaskData(updatedTask);
         setShowSuccesAlert(true);
     };
-
 
     const leaveClickHandler = () => {
         props.onToggleFormChangeable();
@@ -86,14 +91,12 @@ const TaskDetailActions = (props) => {
                 </Button>
             }
 
-            {showSuccessAlert && <Alert
-                onClose={() => { setShowSuccesAlert(false) }}
-                sx={{
-                    position: 'absolute'
-                }}
-            >
-                Changes saved!
-            </Alert>}
+            {showSuccessAlert && <ModalAlert
+                type='success'
+                message='Changes saved.'
+                onClose={closeAlertHandler}
+            />}
+
         </Box>
     )
 };

@@ -36,7 +36,6 @@ const SidebarSection = (props) => {
             </Divider>
 
             <List>{sectionListItems}</List>
-
         </>
     )
 }

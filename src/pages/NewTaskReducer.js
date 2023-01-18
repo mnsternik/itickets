@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import { useSelector } from 'react-redux';
 import { readCategoriesData, readNewTaskId, writeNewTaskData } from '../lib/api';
 
@@ -6,24 +6,44 @@ import NewTaskForm from '../components/NewTask/NewTaskForm';
 
 import { Button, Typography, Paper, Divider } from '@mui/material';
 
+const initialTaskState = {
+    title: '',
+    description: '',
+    priority: '',
+    category: '',
+};
+
+function newTaskFormReducer(state, action) {
+    switch (action.type) {
+        case 'titleChange':
+            return { ...state, title: action.payload };
+        case 'descriptionChange':
+            return { ...state, description: action.payload };
+        case 'priorityChange':
+            return { ...state, priority: action.payload };
+        case 'categoryChange':
+            return { ...state, category: action.payload };
+        case 'clearForm':
+            return { initialTaskState };
+        default:
+            throw new Error();
+    }
+};
+
 const NewTask = () => {
 
-    const userData = useSelector(state => state.auth.userData);
-
-    const [titleInputValue, setTitleInputValue] = useState('');
-    const [descriptionInputValue, setDescriptionInputValue] = useState('');
-    const [priorityInputValue, setPriorityInputValue] = useState('');
-    const [categoryInputValue, setCategoryInputValue] = useState('');
-
+    const [newTaskState, newTaskDispatch] = useReducer(newTaskFormReducer, initialTaskState);
     const [newTaskId, setNewTaskId] = useState('');
-    const [categories, setCategories] = useState([]);
+    const [allCategories, setAllCategories] = useState([]);
 
-    const categoriesNamesArray = categories ?
-        categories.map(category => category.name) : [];
+    const user = useSelector(state => state.auth.username);
+
+    const categoriesNamesArray = allCategories ?
+        allCategories.map(category => category.name) : [];
 
     useEffect(() => {
         readNewTaskId(setNewTaskId);
-        readCategoriesData(setCategories);
+        readCategoriesData(setAllCategories);
     }, [])
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -35,51 +55,53 @@ const NewTask = () => {
     });
 
     const titleChangeHandler = (event) => {
-        setTitleInputValue(event.target.value);
+        newTaskDispatch({ type: 'titleChange', payload: event.target.value })
     };
 
     const descriptionChangeHandler = (event) => {
-        setDescriptionInputValue(event.target.value);
+        newTaskDispatch({ type: 'descriptionChange', payload: event.target.value })
     };
 
     const priorityChangeHandler = (event) => {
-        setPriorityInputValue(event.target.value);
+        newTaskDispatch({ type: 'priorityChange', payload: event.target.value })
     };
 
     const categoryChangeHandler = (event) => {
-        setCategoryInputValue(event.target.value);
+        newTaskDispatch({ type: 'categoryChange', payload: event.target.value })
     };
+
 
     const submitHandler = (event) => {
         event.preventDefault();
 
         const newTask = {
+            ...newTaskState,
             id: newTaskId,
             createDate: dateFormatter.format(new Date()),
             modificationDate: dateFormatter.format(new Date()),
-            priority: parseInt(priorityInputValue),
-            category: categoryInputValue,
-            title: titleInputValue,
-            description: descriptionInputValue,
-            authorId: userData.uid,
-            author: userData.name,
-            status: 'Open',
-            currentUserId: null,
-            currentUser: null,
+            priority: parseInt(priorityInputValue), // it is not number?
+            currentUser: 'None',
             currentGroup: 'Helpdesk',
+            author: user,
+            status: 'Open'
         };
 
         writeNewTaskData(newTask);
-
-        setTitleInputValue('');
-        setDescriptionInputValue('');
-        setCategoryInputValue('');
-        setPriorityInputValue('');
+        newTaskDispatch({ type: 'clearForm ' });
     };
 
 
     return (
-        <Paper sx={{ p: 4 }}>
+        <Paper
+            component='form'
+            sx={{
+                minHeight: '500px',
+                p: 4,
+                my: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-evenly',
+            }}>
 
             <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                 Create new task
@@ -103,7 +125,7 @@ const NewTask = () => {
                 variant="contained"
                 size="large"
                 onClick={submitHandler}
-                sx={{ width: '120px', mt: 2 }}
+                sx={{ width: '120px' }}
             >
                 Send
             </Button>

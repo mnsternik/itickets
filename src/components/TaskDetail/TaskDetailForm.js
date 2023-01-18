@@ -15,7 +15,7 @@ const TaskDetailForm = (props) => {
 
     return (
 
-        <Stack spacing={2} sx={{ my: 6 }}>
+        <Stack spacing={2} sx={{ my: 3 }}>
 
             <TextField
                 label="Title"
@@ -27,7 +27,7 @@ const TaskDetailForm = (props) => {
                 label="Description"
                 inputProps={{ readOnly: props.isFormDisabled }}
                 multiline
-                rows={6}
+                rows={8}
                 value={props.taskData.description}
                 sx={{ my: 1 }}
             />
@@ -57,7 +57,6 @@ const TaskDetailForm = (props) => {
                     label="Last modification date"
                     value={props.taskData.modificationDate}
                     inputProps={{ readOnly: true }}
-
                 />
 
             </Stack>
@@ -117,7 +116,6 @@ const TaskDetailForm = (props) => {
                 />
 
             </Stack>
-
         </Stack>
     )
 };

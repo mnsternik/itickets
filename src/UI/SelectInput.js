@@ -31,9 +31,7 @@ const SelectInput = (props) => {
 
 
     return (
-        <FormControl
-            fullWidth={props.fullWidth || false}
-            sx={{ mx: 1 }}>
+        <FormControl sx={{ ...props.sx, minWidth: 120 }}>
 
             <InputLabel id={props.labelId || props.label + 'LabelId'}>
                 {props.label}
@@ -45,6 +43,7 @@ const SelectInput = (props) => {
                 defaultValue=''
                 onChange={props.onChange}
                 size={props.size || 'medium'}
+
                 {...props}
             >
                 {options}
@@ -55,20 +54,3 @@ const SelectInput = (props) => {
 };
 
 export default SelectInput;
-
-/*<FormControl error={isPriorityInvalid}>
-<InputLabel size="small" id="priority-label">Priority</InputLabel>
-<Select
-    labelId="priority-label"
-    id="priority"
-    value={props.priority}
-    label="Priority"
-    size="small"
-    onChange={props.onPriorityChange}
-    onBlur={priorityBlurHandler}
-    sx={{ width: '180px', textAlign: 'center' }}
->
-    {prioritiesList}
-</Select>
-{isPriorityInvalid && <FormHelperText>Please choose priority.</FormHelperText>}
-</FormControl>*/

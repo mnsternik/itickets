@@ -10,7 +10,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: '1px solid #000',
     boxShadow: 24,
     pt: 2,
     px: 4,
@@ -20,24 +20,30 @@ const style = {
 const ModalAlert = (props) => {
 
     const [open, setOpen] = useState(true);
-    const closeHandler = () => setOpen(false);
+
+    const closeHandler = () => {
+        setOpen(false);
+        props.onClose()
+    };
 
     return (
         <Modal open={open} onClose={closeHandler}>
 
             <Alert sx={style} severity={props.type}>
 
-                <Typography variant='body2'>
+                <Typography variant='body1'>
                     {props.message}
                 </Typography>
 
                 <Button
                     onClick={closeHandler}
+                    size='large'
                     variant='outlined'
                     sx={{ mt: 2 }}
                 >
                     OK
                 </Button>
+
             </Alert>
 
         </Modal>

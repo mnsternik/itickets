@@ -22,7 +22,6 @@ const Sidebar = () => {
 
   const accountLinksData = [
     { text: 'Account', path: '/account' },
-    { text: 'Logout', path: '/logout' },
   ];
 
   const administrationLinksData = [
@@ -62,7 +61,7 @@ const Sidebar = () => {
         <SidebarSection title={'Tasks'} listItems={tablesLinksData} />
         <SidebarSection title={'Actions'} listItems={actionsLinksData} />
         <SidebarSection title={'Settings'} listItems={accountLinksData} />
-        {isAdmin && <SidebarSection title={'Administration'} listItems={administrationLinksData} />}
+        {<SidebarSection title={'Administration'} listItems={administrationLinksData} />}
 
       </Box>
 

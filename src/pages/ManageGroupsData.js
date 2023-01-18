@@ -4,7 +4,7 @@ import { readAllGroupsData } from '../lib/api';
 import DataList from '../components/ManageData/Groups/DataList';
 import NewGroup from '../components/ManageData/Groups/NewGroup';
 
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, Stack } from '@mui/material';
 
 
 const ManageGroupsData = () => {
@@ -16,24 +16,18 @@ const ManageGroupsData = () => {
     }, [])
 
     return (
-        <Paper
-            sx={{
-                minHeight: '500px',
-                p: 4,
-                my: 4,
-                display: 'flex',
-                flexDirection: 'column',
-            }}>
+        <Stack>
+            <Paper sx={{ p: 4 }}>
+                <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
+                    Groups data manager
+                </Typography>
 
-            <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
-                Groups data manager
-            </Typography>
+                <DataList groupsData={groupsData} />
 
-            <DataList groupsData={groupsData} />
+                <NewGroup />
 
-            <NewGroup />
-
-        </Paper>
+            </Paper>
+        </Stack>
     );
 };
 

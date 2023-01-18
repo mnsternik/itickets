@@ -70,6 +70,8 @@ const TaskDetail = () => {
     };
 
     const categoryChangeHandler = (event) => {
+        //removeCategoryMember(event.target.value, taskData.id);
+        //wirteCategoryMember(event.target.value, taskData.id)
         setTaskData({ ...taskData, category: event.target.value });
     };
 

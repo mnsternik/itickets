@@ -8,8 +8,8 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 const GroupTasks = () => {
 
     const userGroup = useSelector(state => state.auth.userData.group);
-    const [allGroups, setAllGroups] = useState([]);
     const [filterItem, setFilterItem] = useState({ name: userGroup, value: userGroup });
+    const [allGroups, setAllGroups] = useState([]);
 
     const [tasks, setTasks] = useState([]);
 

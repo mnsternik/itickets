@@ -13,24 +13,37 @@ const DataList = (props) => {
 
     let groupsList;
     if (groupsData.length) {
-        groupsList = groupsData.map(group => (
-            <TableRow key={group.name}>
-                <TableCell component="th" scope="row">
-                    {group.name}
-                </TableCell>
-                <TableCell align="center">
-                    {group.members ? group.members.length : 0}
-                </TableCell>
-                <TableCell align="right">
-                    {<Button onClick={() => deleteGroupHandler(group.id)}>Delete</Button>}
-                </TableCell>
-            </TableRow>
-        ))
+        groupsList = groupsData.map(group => {
+
+            let groupMembersAmount;
+            if (group.members) {
+                groupMembersAmount = Object.keys(group.members).length;
+            }
+
+            return (
+                <TableRow key={group.name}>
+
+                    <TableCell component="th" scope="row">
+                        {group.name}
+                    </TableCell>
+
+                    <TableCell align="center">
+                        {group.members ? groupMembersAmount : 0}
+                    </TableCell>
+
+                    <TableCell align="right">
+                        {<Button onClick={() => deleteGroupHandler(group.id)}>Delete</Button>}
+                    </TableCell>
+
+                </TableRow>
+            )
+        })
     }
 
     return (
         <TableContainer>
             <Table sx={{ minWidth: 450, my: 4, px: 2 }}>
+
                 <TableHead>
                     <TableRow >
                         <TableCell sx={{ color: 'text.secondary' }}>Name</TableCell>
@@ -38,9 +51,11 @@ const DataList = (props) => {
                         <TableCell sx={{ color: 'text.secondary' }} align="right">Action</TableCell>
                     </TableRow>
                 </TableHead>
+
                 <TableBody>
                     {groupsList}
                 </TableBody>
+
             </Table>
         </TableContainer>
     )

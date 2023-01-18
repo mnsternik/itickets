@@ -59,7 +59,7 @@ const TasksTable = (props) => {
 
     return (
         <>
-            <TableContainer component={Paper} sx={{ my: 4 }}>
+            <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
                         <TableRow>

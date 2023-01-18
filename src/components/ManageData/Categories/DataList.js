@@ -13,24 +13,37 @@ const DataList = (props) => {
 
     let categoriesList;
     if (categoriesData.length) {
-        categoriesList = categoriesData.map(category => (
-            <TableRow key={category.id}>
-                <TableCell component="th" scope="row">
-                    {category.name}
-                </TableCell>
-                <TableCell align="center">
-                    {category.tasksAssigned ? category.tasksAssigned.length : 0}
-                </TableCell>
-                <TableCell align="right">
-                    {<Button onClick={() => deleteCategoryHandler(category.id)}>Delete</Button>}
-                </TableCell>
-            </TableRow>
-        ))
+        categoriesList = categoriesData.map(category => {
+
+            let categoryMembersAmount;
+            if (category.members) {
+                categoryMembersAmount = Object.keys(category.members).length;
+            }
+
+            return (
+                <TableRow key={category.id}>
+
+                    <TableCell component="th" scope="row">
+                        {category.name}
+                    </TableCell>
+
+                    <TableCell align="center">
+                        {category.members ? categoryMembersAmount : 0}
+                    </TableCell>
+
+                    <TableCell align="right">
+                        {<Button onClick={() => deleteCategoryHandler(category.id)}>Delete</Button>}
+                    </TableCell>
+
+                </TableRow>
+            )
+        })
     }
 
     return (
         <TableContainer>
             <Table sx={{ minWidth: 450, my: 4, px: 2 }}>
+
                 <TableHead>
                     <TableRow >
                         <TableCell sx={{ color: 'text.secondary' }}>Name</TableCell>
@@ -39,9 +52,11 @@ const DataList = (props) => {
 
                     </TableRow>
                 </TableHead>
+
                 <TableBody>
                     {categoriesList}
                 </TableBody>
+
             </Table>
         </TableContainer>
     )

@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { auth } from './util/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { readUserData } from './lib/api';
+import { authActions } from './store/auth';
 
 import NotFound from './pages/NotFound';
 import SignIn from './pages/SignIn';
-import SignOut from './pages/SignOut';
 import Sidebar from './components/Sidebar/Sidebar';
 import NewTask from './pages/NewTask';
 import GroupTasks from './pages/GroupTasks';
@@ -16,47 +20,60 @@ import ManageCategoriesData from './pages/ManageCategoriesData';
 import ManageGroupsData from './pages/ManageGroupsData';
 import ManageUsersData from './pages/ManageUsersData';
 import Account from './pages/Account';
+import Bar from './components/Bar/Bar';
 
-import { ThemeProvider, createTheme, Container, CssBaseline } from '@mui/material';
-import './App.css';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
+import { ThemeProvider, createTheme, Container, CssBaseline, Box } from '@mui/material';
 
-const lightTheme = createTheme({
-  palette: {
-    mode: 'light',
-  },
-});
 
-const PrivateRoutes = () => {
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
-  return (
-    isLoggedIn ? <Outlet /> : <Navigate to='/sign-in' />
-  )
-};
+const darkTheme = createTheme({ palette: { mode: 'dark' } });
+const lightTheme = createTheme({ palette: { mode: 'light' } });
 
 
 const App = () => {
 
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const dispatch = useDispatch();
+
+  const token = useSelector(state => state.auth.token);
+
   const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
   const theme = isDarkModeEnabled ? darkTheme : lightTheme;
+
+
+  const dispatchUserData = useCallback((userData) => {
+    dispatch(authActions.signIn(userData));
+  }, [dispatch]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        readUserData(user.uid, dispatchUserData);
+      } else {
+        dispatch(authActions.signOut());
+      }
+    });
+  }, [dispatch, dispatchUserData])
+
+
+  const PrivateRoutes = () => token ? <Outlet /> : <Navigate to='/sign-in' />
+  const RedirectLoggedUser = () => token ? <Navigate to='/user-tasks' /> : <Outlet />
+
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline>
-        <div className="App">
-          {isLoggedIn && <Sidebar />}
-          <Container maxWidth="lg">
+
+        {token && <Bar />}
+
+        <Box sx={{ display: 'flex' }}>
+
+          {token && <Sidebar />}
+
+          <Container>
 
             <Routes>
               <Route element={<PrivateRoutes />}>
                 <Route path='/' element={<UserTasks />} />
-                <Route path='/sign-out' element={<SignOut />} />
                 <Route path='/newtask' element={<NewTask />} />
                 <Route path='/user-tasks' element={<UserTasks />} />
                 <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
@@ -70,19 +87,17 @@ const App = () => {
                 <Route path='*' element={<NotFound />} />
               </Route>
 
-              <Route path='/sign-in' element={<SignIn />} />
-
+              <Route element={<RedirectLoggedUser />}>
+                <Route path='/sign-in' element={<SignIn />} />
+              </Route>
             </Routes>
 
           </Container>
-        </div>
+        </Box>
+
       </CssBaseline>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
-
-
-  //<Suspense fallback={<CircularProgress />}>
-  //const NewTask = React.lazy(() => import('./newtask'));

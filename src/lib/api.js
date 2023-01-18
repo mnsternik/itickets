@@ -4,6 +4,14 @@ import { db, auth } from '../util/firebase';
 
 //add check if data exists (for example 2 groups with same name? 
 
+//for changing categories and groups names to their ids
+function camelize(str) {
+    return str
+        .split(' ')
+        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
+        .join('');
+};
+
 
 // ------------  AUTH --------------
 
@@ -29,20 +37,10 @@ export function writeNewUserData(userData, password, setError) {
 };
 
 
-export function signUserIn(email, password, dispatchUserData, setError, navigate) {
+export function signUserIn(email, password, setError) {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            return userCredential.user.uid;
-        })
-        .then((uid) => {
-            // find user data in db with uid returned from firebase auth 
-            onValue(ref(db, '/users/' + uid), (snapshot) => {
-                dispatchUserData(snapshot.val());
-            });
-        })
-        .then(() => {
-            // navigate logged user to /user-tasks route
-            navigate();
+            localStorage.setItem('iticketsUid', userCredential.user.uid);
         })
         .catch((error) => {
             if (error.code === 'auth/invalid-email') {
@@ -59,6 +57,7 @@ export function signUserIn(email, password, dispatchUserData, setError, navigate
 
 
 export function signUserOut() {
+    localStorage.removeItem('iticketsUid');
     signOut(auth)
 };
 
@@ -195,11 +194,7 @@ export function readAllGroupsData(updateGroups) {
 
 
 export function readSingleGroupData(groupName) {
-    const groupId = groupName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
+    const groupId = camelize(groupName);
     const groupRef = ref(db, '/groups/' + groupId);
     onValue(groupRef, (snapshot) => {
         return snapshot.val();
@@ -214,22 +209,14 @@ export function deleteGroup(groupId) {
 
 
 export function writeNewGroupMember(groupName, userId) {
-    const groupId = groupName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
+    const groupId = camelize(groupName);
     const newMemberRef = ref(db, '/groups/' + groupId + '/members');
     push(newMemberRef, userId);
 };
 
 
 export function readGroupMembers(groupName, setMembers) {
-    const groupId = groupName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
+    const groupId = camelize(groupName)
     const groupRef = ref(db, '/groups/' + groupId);
     onValue(groupRef, (snapshot) => {
         const members = snapshot.val();
@@ -272,22 +259,14 @@ export function deleteCategory(categoryId) {
 
 
 export function writeNewCategoryMember(categoryName, taskId) {
-    const categoryId = categoryName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
+    const categoryId = camelize(categoryName)
     const newMemberRef = ref(db, '/categories/' + categoryId + '/members');
     push(newMemberRef, taskId);
 };
 
 
 export function readCategoryMembers(categoryName, setMembers) {
-    const categoryId = categoryName
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
-
+    const categoryId = camelize(categoryName)
     const categoryRef = ref(db, '/categories/' + categoryId);
     onValue(categoryRef, (snapshot) => {
         const members = snapshot.val();
