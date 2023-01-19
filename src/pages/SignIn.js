@@ -74,9 +74,9 @@ const SignIn = () => {
             <Divider />
 
             <Typography variant="subtitle2" sx={{ fontWeight: 200 }}>
-                In case of problem, contact our Helpdesk: <br />
-                Phone number: (+48 123-456-789) <br />
-                E-Mail: example@mail.com
+                In case of problem contact our Helpdesk: <br />
+                Phone number: <strong>+48 123-456-789</strong> <br />
+                E-Mail: <strong>example@mail.com</strong>
             </Typography>
 
         </Paper>
