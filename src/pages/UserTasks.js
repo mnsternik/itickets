@@ -18,47 +18,15 @@ const UserTasks = () => {
 
     const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
 
-    // select input option expects a "value" property
     const allUsersSelectOptions = allUsers.map(user => ({ name: user.name, value: user.uid }));
 
-    // changes sortingItem to camelCase property name
-    const sortingKey = sortingItem
-        .split(' ')
-        .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
-        .join('');
+    const tasksAssignedToUser = tasks.filter(task => task.currentUserId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
 
     useEffect(() => {
         readAllTasksData(setTasks); //setError
         readAllUsersData(setAllUsers); //setError
     }, []);
 
-    // filter open tasks assigned to logged user
-    const filteredTasks = tasks.filter(task => task.currentUserId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
-
-    let sortedTasks = [];
-    if (filteredTasks.length) {
-
-        //sorting item is string
-        if (typeof filteredTasks[0][sortingKey] === 'string') {
-            sortedTasks = sortingOrder === 'Ascending' ?
-                filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])) :
-                filteredTasks.sort((a, b) => a[sortingKey].localeCompare(b[sortingKey])).reverse();
-        }
-
-        //sorting item is number
-        else if (typeof filteredTasks[0][sortingKey] === 'number') {
-            sortedTasks = sortingOrder === 'Ascending' ?
-                filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]) :
-                filteredTasks.sort((a, b) => a[sortingKey] - b[sortingKey]).reverse();
-        }
-
-        //sorting item is date
-        else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
-            sortedTasks = sortingOrder === 'Ascending' ?
-                filteredTasks.sort((a, b) => Date.parse(a[sortingKey]) - Date.parse(b[sortingKey])) :
-                filteredTasks.sort((a, b) => Date.parse(a[sortingKey]) - Date.parse(b[sortingKey])).reverse();
-        }
-    }
 
     const filterItemChangeHandler = (updatedFilterItem) => {
         setFilterItem(updatedFilterItem);
@@ -89,8 +57,11 @@ const UserTasks = () => {
             />
 
             <TasksTable
-                tasks={sortedTasks}
+                tasks={tasksAssignedToUser}
                 labels={labels}
+                sortingOrder={sortingOrder}
+                sortingItem={sortingItem}
+                noTasksMessage={`There is no tasks assigned to user ${filterItem.name}`}
             />
         </>
     );

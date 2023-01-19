@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { camelize } from '../../lib/api';
 
 import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
@@ -22,19 +23,52 @@ const TasksTable = (props) => {
 
     const navigate = useNavigate();
 
+    const {
+        tasks,
+        labels,
+        sortingOrder,
+        sortingItem,
+        error,
+        noTasksMessage
+    } = props;
+
+    let sortedTasks = [];
+
+    const sortTasks = (tasks, sortingOrder, sortingItem) => {
+        const sortedTasks = structuredClone(tasks);
+        const sortingKey = camelize(sortingItem);
+        const sortingKeyDataType = typeof tasks[0][sortingKey];
+
+        if (sortingKeyDataType === 'string') {
+            sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
+        }
+        else if (sortingKeyDataType === 'number') {
+            sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
+        }
+        else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
+            sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
+        }
+
+        return sortingOrder === 'Ascending' ?
+            sortedTasks : sortedTasks.reverse()
+    };
+
+
     const rowClickHandler = (taskId) => {
         navigate(`/tasks/${taskId}`);
     };
 
     let message;
-    if (props.error) {
+    if (error) {
         message = 'Failed to fetched content.';
     }
-    else if (!props.tasks.length && !props.error) {
-        message = 'There is no tasks yet.';
+    else if (!tasks.length && !error) {
+        message = noTasksMessage
+    } else {
+        sortedTasks = sortTasks(tasks, sortingOrder, sortingItem);
     }
 
-    const tableContent = props.tasks.map((task) => (
+    const tableContent = sortedTasks.map((task) => (
         <StyledTableRow
             key={task.id}
             onClick={() => rowClickHandler(task.id)}
@@ -52,7 +86,7 @@ const TasksTable = (props) => {
         </StyledTableRow>
     ));
 
-    const tableHead = props.labels.map((label) => (
+    const tableHead = labels.map((label) => (
         <StyledTableCell align="center" key={label}> {label} </StyledTableCell>
     ));
 
@@ -72,7 +106,7 @@ const TasksTable = (props) => {
                 </Table>
             </TableContainer>
 
-            <Typography variant='subtitle2' sx={{ textAlign: 'center' }}>
+            <Typography variant='subtitle2' sx={{ textAlign: 'center', mt: 2 }}>
                 {message}
             </Typography>
         </>

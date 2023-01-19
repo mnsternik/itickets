@@ -4,8 +4,8 @@ import { db, auth } from '../util/firebase';
 
 //add check if data exists (for example 2 groups with same name? 
 
-//for changing categories and groups names to their ids
-function camelize(str) {
+//for changing categories and groups names to their ids (also used in other parts of code)
+export function camelize(str) {
     return str
         .split(' ')
         .map((word, i) => i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.substring(1).toLowerCase()}`)
