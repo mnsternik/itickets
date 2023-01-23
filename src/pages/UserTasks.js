@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { readAllTasksData, readAllUsersData } from '../lib/api';
+import { readAllTasksData, readAllUsersData, readUserData } from '../lib/api';
 
 import TasksTable from './../components/TasksTable/TasksTable';
 import TasksTableActions from './../components/TasksTable/TasksTableActions';
 
 const UserTasks = () => {
 
-    const userData = useSelector(state => state.auth.userData);
+    const token = useSelector(state => state.auth.token);
+    const [userData, setUserData] = useState({ name: '', uid: token });
     const [filterItem, setFilterItem] = useState({ name: userData.name, value: userData.uid });
     const [allUsers, setAllUsers] = useState([]);
 
@@ -19,13 +20,17 @@ const UserTasks = () => {
     const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
 
     const allUsersSelectOptions = allUsers.map(user => ({ name: user.name, value: user.uid }));
-
     const tasksAssignedToUser = tasks.filter(task => task.currentUserId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
 
     useEffect(() => {
         readAllTasksData(setTasks); //setError
         readAllUsersData(setAllUsers); //setError
-    }, []);
+        readUserData(token, setUserData);
+    }, [token]);
+
+    useEffect(() => {
+        setFilterItem({ name: userData.name, value: userData.uid });
+    }, [userData])
 
 
     const filterItemChangeHandler = (updatedFilterItem) => {
