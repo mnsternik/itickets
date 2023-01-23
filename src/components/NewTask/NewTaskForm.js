@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Stack, TextField } from '@mui/material';
+import { Stack, TextField, Button } from '@mui/material';
 import SelectInput from "../../UI/SelectInput";
 
 
@@ -8,27 +9,68 @@ const NewTaskForm = (props) => {
 
     const priorities = useSelector(state => state.tasks.priorities);
 
+    const [titleInputValue, setTitleInputValue] = useState('');
+    const [descriptionInputValue, setDescriptionInputValue] = useState('');
+    const [priorityInputValue, setPriorityInputValue] = useState('');
+    const [categoryInputValue, setCategoryInputValue] = useState('');
+
+    const titleChangeHandler = (event) => {
+        setTitleInputValue(event.target.value);
+    };
+
+    const descriptionChangeHandler = (event) => {
+        setDescriptionInputValue(event.target.value);
+    };
+
+    const priorityChangeHandler = (event) => {
+        setPriorityInputValue(event.target.value);
+    };
+
+    const categoryChangeHandler = (event) => {
+        setCategoryInputValue(event.target.value);
+    };
+
+    const submitHandler = (event) => {
+        event.preventDefault();
+
+        props.onAddNewTask({
+            title: titleInputValue,
+            description: descriptionInputValue,
+            priority: parseInt(priorityInputValue),
+            category: categoryInputValue
+        });
+
+        setTitleInputValue('');
+        setDescriptionInputValue('');
+        setCategoryInputValue('');
+        setPriorityInputValue('');
+    }
+
     return (
-        <Stack spacing={1}>
+        <Stack
+            spacing={1}
+            component='form'
+            onSubmit={submitHandler}
+        >
 
             <TextField
                 label='Title'
-                value={props.title}
-                onChange={props.onTitleChange}
+                value={titleInputValue}
+                onChange={titleChangeHandler}
             />
 
             <TextField
                 label="Description"
-                value={props.description}
+                value={descriptionInputValue}
                 multiline
                 rows="5"
-                onChange={props.onDescriptionChange}
+                onChange={descriptionChangeHandler}
             />
 
             <SelectInput
                 label='Priority'
-                onChange={props.onPriorityChange}
-                value={props.priority}
+                value={priorityInputValue}
+                onChange={priorityChangeHandler}
                 structure='objects'
                 options={priorities}
                 inputProps={{ readOnly: props.isFormDisabled }}
@@ -37,11 +79,20 @@ const NewTaskForm = (props) => {
 
             <SelectInput
                 label='Category'
-                value={props.category}
-                onChange={props.onCategoryChange}
+                value={categoryInputValue}
+                onChange={categoryChangeHandler}
                 options={props.categories}
                 sx={{ width: 180 }}
             />
+
+            <Button
+                type='submit'
+                variant='contained'
+                size='large'
+                sx={{ width: '120px', mt: 2 }}
+            >
+                Send
+            </Button>
 
         </Stack>
     )
