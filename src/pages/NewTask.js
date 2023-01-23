@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { readCategoriesData, readNewTaskId, writeNewTaskData } from '../lib/api';
 
 import NewTaskForm from '../components/NewTask/NewTaskForm';
 
-import { Button, Typography, Paper, Divider } from '@mui/material';
+import { Typography, Paper, Divider, Alert } from '@mui/material';
+
 
 const NewTask = () => {
 
     const userData = useSelector(state => state.auth.userData);
 
-    const [titleInputValue, setTitleInputValue] = useState('');
-    const [descriptionInputValue, setDescriptionInputValue] = useState('');
-    const [priorityInputValue, setPriorityInputValue] = useState('');
-    const [categoryInputValue, setCategoryInputValue] = useState('');
-
     const [newTaskId, setNewTaskId] = useState('');
     const [categories, setCategories] = useState([]);
+
+    const [alertData, setAlertData] = useState({ showAlert: false, taskId: '' });
 
     const categoriesNamesArray = categories ?
         categories.map(category => category.name) : [];
@@ -34,33 +33,16 @@ const NewTask = () => {
         minute: 'numeric'
     });
 
-    const titleChangeHandler = (event) => {
-        setTitleInputValue(event.target.value);
-    };
+    const closeAlertHandler = () => {
+        setAlertData({ showAlert: false, taskId: '' });
+    }
 
-    const descriptionChangeHandler = (event) => {
-        setDescriptionInputValue(event.target.value);
-    };
-
-    const priorityChangeHandler = (event) => {
-        setPriorityInputValue(event.target.value);
-    };
-
-    const categoryChangeHandler = (event) => {
-        setCategoryInputValue(event.target.value);
-    };
-
-    const submitHandler = (event) => {
-        event.preventDefault();
-
+    const addNewTaskHandler = (formData) => {
         const newTask = {
+            ...formData,
             id: newTaskId,
             createDate: dateFormatter.format(new Date()),
             modificationDate: dateFormatter.format(new Date()),
-            priority: parseInt(priorityInputValue),
-            category: categoryInputValue,
-            title: titleInputValue,
-            description: descriptionInputValue,
             authorId: userData.uid,
             author: userData.name,
             status: 'Open',
@@ -70,11 +52,7 @@ const NewTask = () => {
         };
 
         writeNewTaskData(newTask);
-
-        setTitleInputValue('');
-        setDescriptionInputValue('');
-        setCategoryInputValue('');
-        setPriorityInputValue('');
+        setAlertData({ showAlert: true, taskId: newTaskId });
     };
 
 
@@ -87,26 +65,11 @@ const NewTask = () => {
 
             <Divider />
 
-            <NewTaskForm
-                categories={categoriesNamesArray}
-                title={titleInputValue}
-                description={descriptionInputValue}
-                priority={priorityInputValue}
-                category={categoryInputValue}
-                onTitleChange={titleChangeHandler}
-                onDescriptionChange={descriptionChangeHandler}
-                onPriorityChange={priorityChangeHandler}
-                onCategoryChange={categoryChangeHandler}
-            />
+            <NewTaskForm categories={categoriesNamesArray} onAddNewTask={addNewTaskHandler} />
 
-            <Button
-                variant="contained"
-                size="large"
-                onClick={submitHandler}
-                sx={{ width: '120px', mt: 2 }}
-            >
-                Send
-            </Button>
+            {alertData.showAlert && <Alert severity="success" onClose={closeAlertHandler} sx={{ mt: 2 }}>
+                Task successfuly created. You can see it <Link style={{ color: 'green' }} to={`/tasks/${alertData.taskId}`}>here</Link>
+            </Alert>}
 
         </Paper>
     )
