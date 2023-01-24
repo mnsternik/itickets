@@ -1,8 +1,7 @@
-import { ref, set, onValue, push, child } from 'firebase/database';
+import { ref, set, get, onValue, push, child } from 'firebase/database';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { db, auth } from '../util/firebase';
 
-//add check if data exists (for example 2 groups with same name? 
 
 //for changing categories and groups names to their ids (also used in other parts of code)
 export function camelize(str) {
@@ -16,7 +15,7 @@ export function camelize(str) {
 // ------------  AUTH --------------
 
 
-export function writeNewUserData(userData, password, setError) {
+export function writeNewUserData(userData, password, setError, clearForm) {
     createUserWithEmailAndPassword(auth, userData.email, password)
         .then((userCredential) => {
             const uid = userCredential.user.uid;
@@ -25,15 +24,24 @@ export function writeNewUserData(userData, password, setError) {
             set(newUserRef, updatedUserData);
             writeNewGroupMember(userData.group, uid);
         })
+        .then(() => {
+            clearForm();
+        })
         .catch((error) => {
             if (error.code === 'auth/email-already-in-use') {
                 setError('E-mail already in use')
-            } else if (error.code === 'auth/weak-password') {
+            }
+            else if (error.code === 'auth/weak-password') {
                 setError('Password must be at least 6 characters long')
-            } else {
+            }
+            else if (error.code === 'auth/invalid-email') {
+                setError('Inavlid e-mail address')
+            }
+            else {
                 setError('Authentication error. Try again later. ');
             }
-        });
+            return error;
+        })
 };
 
 
@@ -45,11 +53,14 @@ export function signUserIn(email, password, setError) {
         .catch((error) => {
             if (error.code === 'auth/invalid-email') {
                 setError('Invalid e-mail address')
-            } else if (error.code === 'auth/user-not-found') {
+            }
+            else if (error.code === 'auth/user-not-found') {
                 setError('User not found')
-            } else if (error.code === 'auth/wrong-password') {
+            }
+            else if (error.code === 'auth/wrong-password') {
                 setError('Wrong password')
-            } else {
+            }
+            else {
                 setError("Authentication error");
             }
         });
@@ -85,6 +96,12 @@ export function readAllUsersData(updateUsers) {
         }
         updateUsers(transformedUsers);
     });
+};
+
+
+export function updateUserData(userData) {
+    const userRef = ref(db, '/users/' + userData.uid);
+    set(userRef, userData)
 };
 
 
@@ -174,9 +191,18 @@ export function deleteResponse(taskId, responseKey) {
 // ------------  GROUPS DATA -------------- 
 
 
-export function writeNewGroupData(groupData) {
+export function writeNewGroupData(groupData, setError, clearForm) {
     const newGroupRef = ref(db, '/groups/' + groupData.id);
-    set(newGroupRef, groupData);
+    get(newGroupRef).then(snapshot => {
+        if (snapshot.exists()) {
+            throw new Error(`Group ${groupData.name} already exists`);
+        } else {
+            set(newGroupRef, groupData)
+            clearForm('')
+        }
+    }).catch(err => {
+        setError(err.message)
+    })
 };
 
 
@@ -233,9 +259,18 @@ export function readGroupMembers(groupName, setMembers) {
 // ------------  CATEGORIES DATA -------------- 
 
 
-export function writeCategoryData(category) {
+export function writeCategoryData(category, setError, clearForm) {
     const newCategoryRef = ref(db, '/categories/' + category.id);
-    set(newCategoryRef, category)
+    get(newCategoryRef).then(snapshot => {
+        if (snapshot.exists()) {
+            throw new Error(`Category ${category.name} already exists`)
+        } else {
+            set(newCategoryRef, category)
+            clearForm('')
+        }
+    }).catch(err => {
+        setError(err.message)
+    })
 };
 
 
