@@ -29,8 +29,9 @@ const NewResponse = (props) => {
         setResponseInputValue(event.target.value)
     };
 
+    const submitHandler = (event) => {
+        event.preventDefault();
 
-    const addResponseClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
         updatedTask.modificationDate = dateFormatter.format(new Date());
 
@@ -50,7 +51,12 @@ const NewResponse = (props) => {
 
 
     return (
-        <Stack spacing={2} sx={{ mt: 3 }}>
+        <Stack
+            component={'form'}
+            onSubmit={submitHandler}
+            spacing={2}
+            sx={{ mt: 3 }}
+        >
             <SelectInput
                 label='Visibility'
                 value={responseType}
@@ -70,9 +76,9 @@ const NewResponse = (props) => {
 
             <Button
                 variant="contained"
+                type="submit"
                 size='large'
                 disabled={!responseInputValue.length}
-                onClick={addResponseClickHandler}
                 sx={{ width: 80 }}
             >
                 Send
