@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { readAllGroupsData } from '../lib/api';
 
-import DataList from '../components/ManageData/Groups/DataList';
-import NewGroup from '../components/ManageData/Groups/NewGroup';
+import GroupsList from '../components/ManageData/Groups/GroupsList';
+import NewGroupForm from '../components/ManageData/Groups/NewGroupForm';
 
 import { Paper, Typography, Stack } from '@mui/material';
 
@@ -18,13 +18,14 @@ const ManageGroupsData = () => {
     return (
         <Stack>
             <Paper sx={{ p: 4 }}>
+
                 <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                     Groups data manager
                 </Typography>
 
-                <DataList groupsData={groupsData} />
+                <GroupsList groupsData={groupsData} />
 
-                <NewGroup />
+                <NewGroupForm />
 
             </Paper>
         </Stack>

@@ -3,7 +3,7 @@ import { deleteCategory } from '../../../lib/api';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 
-const DataList = (props) => {
+const CategoriesList = (props) => {
 
     const { categoriesData } = props;
 
@@ -62,4 +62,4 @@ const DataList = (props) => {
     )
 };
 
-export default DataList; 
+export default CategoriesList; 

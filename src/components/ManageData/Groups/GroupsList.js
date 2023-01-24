@@ -3,7 +3,7 @@ import { deleteGroup } from '../../../lib/api';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 
-const DataList = (props) => {
+const GroupsList = (props) => {
 
     const { groupsData } = props;
 
@@ -61,4 +61,4 @@ const DataList = (props) => {
     )
 };
 
-export default DataList; 
+export default GroupsList; 

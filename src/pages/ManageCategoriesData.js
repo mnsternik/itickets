@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { readCategoriesData } from '../lib/api';
 
-import DataList from '../components/ManageData/Categories/DataList';
-import NewGroup from '../components/ManageData/Categories/NewCategory';
+import CategoriesList from '../components/ManageData/Categories/CategoriesList';
+import NewCategoryForm from '../components/ManageData/Categories/NewCategoryForm';
 
 import { Paper, Stack, Typography } from '@mui/material';
 
@@ -18,13 +18,14 @@ const ManageCategoriesData = () => {
     return (
         <Stack>
             <Paper sx={{ p: 4 }}>
+
                 <Typography variant='h5' sx={{ fontWeight: 500, mb: 2, p: 2 }}>
                     Categories data manager
                 </Typography>
 
-                <DataList categoriesData={categoriesData} />
+                <CategoriesList categoriesData={categoriesData} />
 
-                <NewGroup />
+                <NewCategoryForm />
             </Paper>
         </Stack>
     );
