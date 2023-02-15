@@ -106,6 +106,7 @@ const EditUserForm = (props) => {
             return;
         }
 
+        toggleFormHandler();
         setShowAlert(true);
     };
 
@@ -152,7 +153,18 @@ const EditUserForm = (props) => {
                     IconComponent={isFormReadOnly ? '' : ArrowDropDownIcon}
                 />
 
+
                 <Stack direction="row" spacing={2}>
+
+                    {!isFormReadOnly && <Button
+                        variant={'contained'}
+                        type='submit'
+                        size='large'
+                        disabled={!isFormTouched}
+                    >
+                        Save
+                    </Button>}
+
 
                     {isFormReadOnly && <Button
                         variant={'contained'}
@@ -161,17 +173,6 @@ const EditUserForm = (props) => {
                         onClick={toggleFormHandler}
                     >
                         Edit
-                    </Button>}
-
-                    {!isFormReadOnly && <Button
-                        variant={'contained'}
-                        form='editUserForm'
-                        type='submit'
-                        size='large'
-                        disabled={!isFormTouched}
-                        onClick={toggleFormHandler}
-                    >
-                        Save
                     </Button>}
 
                     {!isFormReadOnly && <Button onClick={cancelClickHandler} size='large'>
@@ -189,4 +190,4 @@ const EditUserForm = (props) => {
     )
 };
 
-export default EditUserForm
+export default EditUserForm;
