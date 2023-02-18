@@ -1,15 +1,9 @@
-import { useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { updateSingleTaskData } from '../../lib/api';
 
-import ModalAlert from '../../UI/ModalAlert';
-
-import { Box, Button, Alert } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 const TaskDetailActions = (props) => {
-
-    const [showSuccessAlert, setShowSuccesAlert] = useState(false);
 
     const userData = useSelector(state => state.auth.userData);
     const group = useSelector(state => state.auth.userData.group);
@@ -32,32 +26,24 @@ const TaskDetailActions = (props) => {
 
     const assignClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
-
         updatedTask.currentUserId = userData.uid;
         updatedTask.currentUser = userData.name;
         updatedTask.currentGroup = group;
         updatedTask.status = 'In progress';
         updatedTask.modificationDate = dateFormatter.format(new Date());
-
-        updateSingleTaskData(updatedTask);
+        props.onTaskUpdate(updatedTask);
     };
-
 
     const editClickHandler = () => {
         props.onToggleFormChangeable();
     };
 
-    const closeAlertHandler = () => {
-        setShowSuccesAlert(false);
-    };
-
-    const saveClickHandler = () => {
+    const saveClickHandler = (event) => {
+        event.preventDefault();
         const updatedTask = structuredClone(props.taskData);
         updatedTask.modificationDate = dateFormatter.format(new Date());
-
+        props.onTaskUpdate(updatedTask);
         props.onToggleFormChangeable();
-        updateSingleTaskData(updatedTask);
-        setShowSuccesAlert(true);
     };
 
     const leaveClickHandler = () => {
@@ -70,32 +56,36 @@ const TaskDetailActions = (props) => {
             <Button size='large' sx={{ width: '90px' }} onClick={() => navigate(-1)}>
                 Back
             </Button>
+
             {showSaveButton &&
-                <Button size='large' onClick={saveClickHandler} sx={{ width: '90px' }}>
+                <Button
+                    type='submit'
+                    form='taskDetailsForm'
+                    size='large'
+                    onClick={saveClickHandler}
+                    sx={{ width: '90px' }}
+                >
                     Save
                 </Button>
             }
+
             {showEditButton &&
                 <Button size='large' onClick={editClickHandler} sx={{ width: '90px' }}>
                     Edit
                 </Button>
             }
+
             {showSaveButton &&
                 <Button size='large' onClick={leaveClickHandler} sx={{ width: '90px' }}>
                     Leave
                 </Button>
             }
+
             {showAssignButton &&
                 <Button size='large' onClick={assignClickHandler} sx={{ width: '140px' }}>
                     Assing to me
                 </Button>
             }
-
-            {showSuccessAlert && <ModalAlert
-                type='success'
-                message='Changes saved.'
-                onClose={closeAlertHandler}
-            />}
 
         </Box>
     )

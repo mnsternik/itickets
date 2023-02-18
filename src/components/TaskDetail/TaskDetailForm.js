@@ -15,7 +15,12 @@ const TaskDetailForm = (props) => {
 
     return (
 
-        <Stack spacing={2} sx={{ my: 3 }}>
+        <Stack
+            component={'form'}
+            id={'taskDetailsForm'}
+            spacing={2}
+            sx={{ my: 3 }}
+        >
 
             <TextField
                 label="Title"
