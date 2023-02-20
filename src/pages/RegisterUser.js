@@ -22,9 +22,11 @@ const AddUserForm = () => {
     const [showAlert, setShowAlert] = useState(false);
     const alertMessage = error ? error : 'New user created'
 
+
     useEffect(() => {
         readAllGroupsData(setAllGroups);
     }, [])
+
 
     const nameInputChangeHandler = (event) => {
         setName(event.target.value);
@@ -71,7 +73,8 @@ const AddUserForm = () => {
         setGroup('');
         setPassword('');
         setRepeatedPassword('');
-    }
+    };
+
 
     const submitHandler = (event) => {
         event.preventDefault();
@@ -92,6 +95,7 @@ const AddUserForm = () => {
         writeNewUserData(userData, password, setError, clearForm);
         setShowAlert(true);
     };
+
 
     return (
         <Paper sx={{ p: 4 }}>
@@ -148,6 +152,7 @@ const AddUserForm = () => {
                 {showAlert && <Alert severity={error ? 'error' : 'success'} onClose={closeAlertHandler}>
                     {alertMessage}
                 </Alert>}
+                
             </Stack>
         </Paper>
     )
