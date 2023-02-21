@@ -2,12 +2,12 @@ import { InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 
 const SelectInput = (props) => {
 
-    let options;
-    if (props.structure === 'objects') {
+    let options = [];
+    if (props.structure === 'objects' && props.options) {
         options = props.options.map((option) => {
             return (
                 <MenuItem
-                    key={option.name + 'Key'}
+                    key={option.value + 'Key'}
                     value={option.value}
                     sx={{ my: 'auto' }}
                 >
@@ -15,7 +15,7 @@ const SelectInput = (props) => {
                 </MenuItem>
             )
         });
-    } else {
+    } else if (props.options) {
         options = props.options.map((option) => {
             return (
                 <MenuItem
@@ -41,9 +41,7 @@ const SelectInput = (props) => {
                 labelId={props.labelId || props.label + 'LabelId'}
                 id={props.id || props.label + 'Id'}
                 defaultValue=''
-                onChange={props.onChange}
                 size={props.size || 'medium'}
-
                 {...props}
             >
                 {options}
