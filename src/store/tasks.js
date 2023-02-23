@@ -6,6 +6,12 @@ const initialState = {
         { name: '2 - Medium', value: 2 },
         { name: '3 - High', value: 3 },
         { name: '4 - Very high', value: 4 }
+    ],
+    statuses: [
+        { name: 'Open', value: 'open' },
+        { name: 'In progress', value: 'inProgress' },
+        { name: 'Closed', value: 'closed' },
+        { name: 'Failed', value: 'failed' }
     ]
 };
 
