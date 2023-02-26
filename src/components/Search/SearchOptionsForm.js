@@ -2,113 +2,116 @@ import { useReducer } from "react";
 
 import SelectInput from "../../UI/SelectInput";
 
-import { Paper, TextField } from "@mui/material";
+import { TextField, Stack, Button } from "@mui/material";
+
+const initSearchOptions = {
+    assignedToGroup: '',
+    assignedToUser: '',
+    author: '',
+    category: '',
+    priority: '',
+    status: '',
+    title: '',
+    description: '',
+};
 
 const SearchOptionsForm = (props) => {
 
-    const groupsSelectOptions = props.groups.map(group => ({ name: group.name, id: group.id }));
-    const usersSelectOptions = props.users.map(user => ({ name: user.name, id: user.uid }));
-    const categoriesSelectOptions = props.categories.map(category => ({ name: category.name, id: category.id }));
+    const groupsSelectOptions = props.groups.map(group => ({ name: group.name, value: group.id }));
+    const usersSelectOptions = props.users.map(user => ({ name: user.name, value: user.uid }));
+    const categoriesSelectOptions = props.categories.map(category => ({ name: category.name, value: category.id }));
     const prioritesSelectOptions = props.priorites;
+    const statusesSelectOptions = props.statuses;
 
-    const initSearchFormState = {
-        assignedToGroup: '',
-        assignedToUser: '',
-        createdByGroup: '',
-        createdByUser: '',
-        category: '',
-        priority: '',
-        title: '',
-        description: ''
+    const [searchOptionsState, dispatchSearchOptions] = useReducer((prev, next) => {
+
+        return { ...prev, ...next }
+    }, initSearchOptions)
+
+    const submitHandler = (e) => {
+        e.preventDefault();
+
+        console.log(searchOptionsState);
+
     };
 
-    const searchReducer = ((state, action) => {
-        if (action.type === 'assigned_group_change') {
-            return { ...state, assignedToGroup: action.payload }
-        }
-        if (action.type === 'assigned_user_change') {
-            return { ...state, assignedToUser: action.payload }
-        }
-        if (action.type === 'created_group_change') {
-            return { ...state, createdByGroup: action.payload }
-        }
-        if (action.type === 'created_user_change') {
-            return { ...state, createdByUser: action.payload }
-        }
-        if (action.type === 'category_change') {
-            return { ...state, category: action.payload }
-        }
-        if (action.type === 'priority_change') {
-            return { ...state, priority: action.payload }
-        }
-        if (action.type === 'title_change') {
-            return { ...state, title: action.payload }
-        }
-        if (action.type === 'description_change') {
-            return { ...state, description: action.payload }
-        }
-        return initSearchFormState;
-    });
-
-    const [searchState, dispatchSearch] = useReducer(searchReducer, initSearchFormState);
-
-
     return (
-        <Paper component={'form'}>
+        <Stack
+            component={'form'}
+            onSubmit={submitHandler}
+            spacing={2}
+            sx={{ width: '80%' }}
+        >
 
-            <SelectInput
-                label='Assigned to group'
-                options={groupsSelectOptions}
-                structure='objects'
+            <Stack direction='row' spacing={2} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                <SelectInput
+                    label='Assigned to group'
+                    options={groupsSelectOptions}
+                    structure='objects'
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ assignedToGroup: e.target.value })}
+                />
 
-            />
+                <SelectInput
+                    label='Assigned to user'
+                    options={usersSelectOptions}
+                    structure='objects'
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ assignedToUser: e.target.value })}
+                />
 
-            <SelectInput
-                label='Assigned to user'
-                options={usersSelectOptions}
-                structure='objects'
+                <SelectInput
+                    label='Author'
+                    options={usersSelectOptions}
+                    structure='objects'
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ author: e.target.value })}
+                />
+            </Stack>
 
-            />
+            <Stack direction='row' spacing={2} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                <SelectInput
+                    label='Category'
+                    options={categoriesSelectOptions}
+                    structure='objects'
+                    onChange={e => dispatchSearchOptions({ category: e.target.value })}
+                />
 
-            <SelectInput
-                label='Created by group'
-                options={groupsSelectOptions}
-                structure='objects'
+                <SelectInput
+                    label='Priority'
+                    options={prioritesSelectOptions}
+                    structure='objects'
+                    onChange={e => dispatchSearchOptions({ priority: e.target.value })}
+                />
 
-            />
+                <SelectInput
+                    label='Statuses'
+                    options={statusesSelectOptions}
+                    structure='objects'
+                    onChange={e => dispatchSearchOptions({ status: e.target.value })}
+                />
 
-            <SelectInput
-                label='Assigned by user'
-                options={usersSelectOptions}
-                structure='objects'
+                <TextField
+                    label='Title keywords'
+                    onChange={e => dispatchSearchOptions({ title: e.target.value })}
+                />
 
-            />
+                <TextField
+                    label='Description keywords'
+                    onChange={e => dispatchSearchOptions({ description: e.target.value })}
+                />
+            </Stack>
 
-            <SelectInput
-                label='Category'
-                options={categoriesSelectOptions}
-                structure='objects'
+            <Button
+                type='submit'
+                size='large'
+                variant='contained'
+                sx={{ width: 140, }}
+            >
+                Search
+            </Button>
 
-            />
-
-            <SelectInput
-                label='Priority'
-                options={prioritesSelectOptions}
-                structure='objects'
-
-            />
-
-            <TextField
-                label='Title'
-
-            />
-
-            <TextField
-                label='Description'
-
-            />
-
-        </Paper>
+        </Stack>
     )
 };
 

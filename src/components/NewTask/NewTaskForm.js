@@ -1,49 +1,36 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Stack, TextField, Button } from '@mui/material';
 import SelectInput from "../../UI/SelectInput";
 
 
+const initTaskState = {
+    title: '',
+    description: '',
+    priority: '',
+    category: ''
+}
+
 const NewTaskForm = (props) => {
 
     const priorities = useSelector(state => state.tasks.priorities);
 
-    const [titleInputValue, setTitleInputValue] = useState('');
-    const [descriptionInputValue, setDescriptionInputValue] = useState('');
-    const [priorityInputValue, setPriorityInputValue] = useState('');
-    const [categoryInputValue, setCategoryInputValue] = useState('');
+    const [taskState, dispatchTask] = useReducer((prev, next) => {
+        const newTask = { ...prev, ...next }
 
-    const titleChangeHandler = (event) => {
-        setTitleInputValue(event.target.value);
-    };
+        if (newTask.priority.length > 0) {
+            newTask.priority = parseInt(newTask.priority)
+        }
 
-    const descriptionChangeHandler = (event) => {
-        setDescriptionInputValue(event.target.value);
-    };
+        return newTask
+    }, initTaskState)
 
-    const priorityChangeHandler = (event) => {
-        setPriorityInputValue(event.target.value);
-    };
 
-    const categoryChangeHandler = (event) => {
-        setCategoryInputValue(event.target.value);
-    };
-
-    const submitHandler = (event) => {
-        event.preventDefault();
-
-        props.onAddNewTask({
-            title: titleInputValue,
-            description: descriptionInputValue,
-            priority: parseInt(priorityInputValue),
-            category: categoryInputValue
-        });
-
-        setTitleInputValue('');
-        setDescriptionInputValue('');
-        setCategoryInputValue('');
-        setPriorityInputValue('');
+    const submitHandler = (e) => {
+        e.preventDefault();
+        props.onAddNewTask(taskState);
+        dispatchTask(initTaskState);
     }
 
     return (
@@ -55,34 +42,34 @@ const NewTaskForm = (props) => {
 
             <TextField
                 label='Title'
-                value={titleInputValue}
-                onChange={titleChangeHandler}
+                value={taskState.title}
+                onChange={e => dispatchTask({ title: e.target.value })}
             />
 
             <TextField
                 label="Description"
-                value={descriptionInputValue}
+                value={taskState.description}
                 multiline
                 rows="5"
-                onChange={descriptionChangeHandler}
+                onChange={e => dispatchTask({ description: e.target.value })}
             />
 
             <SelectInput
                 label='Priority'
-                value={priorityInputValue}
-                onChange={priorityChangeHandler}
+                value={taskState.priority}
                 structure='objects'
                 options={priorities}
                 inputProps={{ readOnly: props.isFormDisabled }}
                 sx={{ width: 180 }}
+                onChange={e => dispatchTask({ priority: e.target.value })}
             />
 
             <SelectInput
                 label='Category'
-                value={categoryInputValue}
-                onChange={categoryChangeHandler}
+                value={taskState.category}
                 options={props.categories}
                 sx={{ width: 180 }}
+                onChange={e => dispatchTask({ category: e.target.value })}
             />
 
             <Button
