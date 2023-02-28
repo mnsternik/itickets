@@ -21,7 +21,7 @@ const GroupTasks = () => {
     const userGroupTasks = tasks.filter(task => task.currentGroup === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
 
     //labels must correspond to tasks properities names, like Current user -> currentUser
-    const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
+    const labels = ['ID', 'Title', 'Priority', 'Category', 'Status', 'Current user', 'Modification date'];
 
     useEffect(() => {
         readAllTasksData(setTasks);
@@ -51,6 +51,7 @@ const GroupTasks = () => {
         <>
             <TasksTableActions
                 labels={labels}
+                filterLabel='Group'
                 filterItem={filterItem}
                 filterOptions={allGroupsSelectOptions}
                 filteredKey='currentGroup'

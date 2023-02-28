@@ -17,7 +17,7 @@ const UserCreatedTasks = () => {
     const [sortingItem, setSortingItem] = useState('Priority');
     const [sortingOrder, setSortingOrder] = useState('Ascending');
 
-    const labels = ['Title', 'Priority', 'Modification date', 'Status', 'Current user', 'Current group'];
+    const labels = ['ID', 'Title', 'Priority', 'Category', 'Status', 'Current user', 'Current group', 'Modification date'];
 
     const allUsersSelectOptions = allUsers.map(user => ({ name: user.name, value: user.uid }));
     const tasksCreatedByUser = tasks.filter(task => task.authorId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
@@ -50,6 +50,7 @@ const UserCreatedTasks = () => {
         <>
             <TasksTableActions
                 labels={labels}
+                filterLabel='Author'
                 filterItem={filterItem}
                 filterOptions={allUsersSelectOptions}
                 filteredKey='author'
