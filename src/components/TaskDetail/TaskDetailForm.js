@@ -7,11 +7,14 @@ import SelectInput from "../../UI/SelectInput";
 
 const TaskDetailForm = (props) => {
 
-    const priorities = useSelector(state => state.tasks.priorities);
-
-    const { groups, categories, users } = props;
-
-    const currentUserOptionValue = users.find(user => user.value === props.taskData.currentUserId);
+    const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
+    const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(s => s.name);
+    const groupsSelectOptions = props.groups.map(group => group.name)
+    const categoriesSelectOptions = props.categories.map(category => category.name);
+    const groupMembersSelectOptions = props.users
+        .filter(user => user.group === props.taskData.currentGroup)
+        .map(user => ({ name: user.name, value: user.uid }));
+    const currentUserOptionValue = groupMembersSelectOptions.find(user => user.value === props.taskData.currentUserId);
 
     return (
 
@@ -70,30 +73,30 @@ const TaskDetailForm = (props) => {
 
                 <SelectInput
                     label='Status'
-                    onChange={props.onStatusChange}
                     value={props.taskData.status}
-                    options={['Open', 'In progress', 'Closed', 'Canceled']}
+                    options={statusesSelectOptions}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                    onChange={(e) => props.onSelectChange({ status: e.target.value })}
                 />
 
                 <SelectInput
                     label='Category'
-                    options={categories}
-                    onChange={props.onCategoryChange}
-                    value={categories.length ? props.taskData.category : ''}
+                    options={categoriesSelectOptions}
+                    value={props.categories.length ? props.taskData.category : ''}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                    onChange={(e) => props.onSelectChange({ category: e.target.value })}
                 />
 
                 <SelectInput
                     label='Priority'
-                    onChange={props.onPriorityChange}
-                    value={props.taskData.priority}
                     structure='objects'
-                    options={priorities}
+                    options={prioritiesSelectOptions}
+                    value={props.taskData.priority}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                    onChange={(e) => props.onSelectChange({ priority: e.target.value })}
                 />
 
             </Stack>
@@ -102,22 +105,22 @@ const TaskDetailForm = (props) => {
 
                 <SelectInput
                     label='Current group'
-                    onChange={props.onCurrentGroupChange}
-                    value={groups.length ? props.taskData.currentGroup : ''}
-                    options={groups}
+                    options={groupsSelectOptions}
+                    value={props.groups.length ? props.taskData.currentGroup : ''}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
+                    onChange={props.onCurrentGroupChange}
                 />
 
                 <SelectInput
                     label='Current user'
                     structure='objects'
+                    options={groupMembersSelectOptions}
                     value={currentUserOptionValue ? currentUserOptionValue.value : ''}
-                    options={users}
-                    onChange={props.onCurrentUserChange}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
                     sx={{ minWidth: 140 }}
+                    onChange={props.onCurrentUserChange}
                 />
 
             </Stack>

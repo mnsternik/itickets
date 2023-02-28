@@ -12,7 +12,7 @@ const TaskDetailActions = (props) => {
 
     //show "Assign to me" button only when logged user is not task's currentUser and logged user's group IS task's currentGroup
     const showAssignButton = userData.uid !== props.taskData.currentUserId && group === props.taskData.currentGroup && props.isFormDisabled;
-    const showEditButton = userData.uid === props.taskData.currentUserId && props.isFormDisabled;
+    const showEditButton = userData.uid === props.taskData.currentUserId;
     const showSaveButton = !props.isFormDisabled;
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -22,7 +22,6 @@ const TaskDetailActions = (props) => {
         hour: 'numeric',
         minute: 'numeric'
     });
-
 
     const assignClickHandler = () => {
         const updatedTask = structuredClone(props.taskData);
@@ -34,26 +33,23 @@ const TaskDetailActions = (props) => {
         props.onTaskUpdate(updatedTask);
     };
 
-    const editClickHandler = () => {
-        props.onToggleFormChangeable();
-    };
-
     const saveClickHandler = (event) => {
         event.preventDefault();
         const updatedTask = structuredClone(props.taskData);
         updatedTask.modificationDate = dateFormatter.format(new Date());
         props.onTaskUpdate(updatedTask);
-        props.onToggleFormChangeable();
+        props.onToggleForm();
     };
 
-    const leaveClickHandler = () => {
-        props.onToggleFormChangeable();
-    };
 
     return (
         <Box sx={{ display: 'flex', mb: 1 }}>
 
-            <Button size='large' sx={{ width: '90px' }} onClick={() => navigate(-1)}>
+            <Button
+                size='large'
+                sx={{ width: '90px' }}
+                onClick={() => navigate(-1)}
+            >
                 Back
             </Button>
 
@@ -70,19 +66,21 @@ const TaskDetailActions = (props) => {
             }
 
             {showEditButton &&
-                <Button size='large' onClick={editClickHandler} sx={{ width: '90px' }}>
-                    Edit
-                </Button>
-            }
-
-            {showSaveButton &&
-                <Button size='large' onClick={leaveClickHandler} sx={{ width: '90px' }}>
-                    Leave
+                <Button
+                    size='large'
+                    onClick={props.onToggleForm}
+                    sx={{ width: '90px' }}
+                >
+                    {props.isFormDisabled ? 'Edit' : 'Leave'}
                 </Button>
             }
 
             {showAssignButton &&
-                <Button size='large' onClick={assignClickHandler} sx={{ width: '140px' }}>
+                <Button
+                    size='large'
+                    onClick={assignClickHandler}
+                    sx={{ width: '140px' }}
+                >
                     Assing to me
                 </Button>
             }
