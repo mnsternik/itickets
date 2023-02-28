@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import { useParams } from 'react-router-dom';
-import { readSingleTaskData, readAllGroupsData, readCategoriesData, readAllUsersData } from '../lib/api';
+import { readSingleTaskData, readAllGroupsData, readCategoriesData, readAllUsersData, updateSingleTaskData } from '../lib/api';
 
 import TaskDetailForm from '../components/TaskDetail/TaskDetailForm';
 import NewResponse from '../components/Response/NewResponse';
@@ -9,41 +9,43 @@ import TaskDetailActions from '../components/TaskDetail/TaskDetailActions';
 
 import { Divider, Paper, Typography } from '@mui/material';
 
+
+const initTaskState = {
+    id: '',
+    priority: '',
+    currentGroup: '',
+    currentUser: '',
+    category: '',
+    status: '',
+    author: '',
+    description: '',
+    createDate: '',
+    modificationDate: '',
+};
+
 const TaskDetail = () => {
 
     const params = useParams();
     const { taskId } = params;
 
-    const [isFormDisabled, setIsFormDisabled] = useState(true);
+    const [taskState, dispatchTask] = useReducer((state, action) => {
+
+        // task with given id not found
+        if (!action) {
+            return action;
+        }
+
+        return ({ ...state, ...action })
+    }, initTaskState);
 
     const [groups, setGroups] = useState([]);
     const [categories, setCategories] = useState([]);
     const [users, setUsers] = useState([]);
-    const [taskData, setTaskData] = useState({
-        id: '',
-        priority: '',
-        currentGroup: '',
-        currentUser: '',
-        category: '',
-        status: '',
-        author: '',
-        description: '',
-        createDate: '',
-        modificationDate: '',
-    });
 
-
-    const groupsNamesArr = groups.map(group => group.name);
-    const categoriesNamesArr = categories.map(category => category.name);
-
-    let selectedGroupMembers = [];
-    if (taskData && taskData.currentGroup) {
-        selectedGroupMembers = users.filter(user => user.group === taskData.currentGroup);
-    }
-    const groupMembersSelectOptions = selectedGroupMembers.map(user => ({ name: user.name, value: user.uid }));
+    const [isFormDisabled, setIsFormDisabled] = useState(true);
 
     useEffect(() => {
-        readSingleTaskData(taskId, setTaskData);
+        readSingleTaskData(taskId, dispatchTask);
         readAllGroupsData(setGroups);
         readCategoriesData(setCategories);
         readAllUsersData(setUsers);
@@ -52,8 +54,7 @@ const TaskDetail = () => {
 
     const currentUserChangeHandler = (event) => {
         const selectedUser = users.find(user => user.uid === event.target.value);
-        setTaskData({
-            ...taskData,
+        dispatchTask({
             currentUserId: selectedUser.uid,
             currentUser: selectedUser.name,
             currentGroup: selectedUser.group
@@ -61,45 +62,29 @@ const TaskDetail = () => {
     };
 
     const currentGroupChangeHandler = (event) => {
-        setTaskData({
-            ...taskData,
+        dispatchTask({
             currentGroup: event.target.value,
             currentUser: '',
             currentUserId: ''
         });
     };
 
-    const categoryChangeHandler = (event) => {
-        //removeCategoryMember(event.target.value, taskData.id);
-        //wirteCategoryMember(event.target.value, taskData.id)
-        setTaskData({ ...taskData, category: event.target.value });
-    };
-
-    const priorityChangeHandler = (event) => {
-        setTaskData({ ...taskData, priority: event.target.value });
-    };
-
-    const statusChangeHandler = (event) => {
-        setTaskData({ ...taskData, status: event.target.value });
-    };
-
-    const toggleFormChangeable = () => {
+    const toggleFormHandler = () => {
         setIsFormDisabled(prevState => !prevState);
     };
 
-    const updateTaskHandler = (task) => {
-        setTaskData(task)
+    const updateTaskHandler = (taskData) => {
+        updateSingleTaskData(taskData);
     };
 
     return (
         <>
-            {taskData && taskData.id && taskData.id.length > 0 &&
+            {taskState && taskState.id && taskState.id.length > 0 &&
                 <Paper
                     elevation={3}
                     sx={{
                         minWidth: 700,
                         minHeight: 800,
-                        my: 4,
                         p: 4,
                         display: 'flex',
                         flexDirection: 'column',
@@ -108,36 +93,38 @@ const TaskDetail = () => {
                 >
 
                     <TaskDetailActions
+                        isFormDisabled={isFormDisabled}
+                        taskData={taskState}
                         onCurrentUserChange={currentUserChangeHandler}
                         onCurrentGroupChange={currentGroupChangeHandler}
-                        onToggleFormChangeable={toggleFormChangeable}
-                        onUpdate={updateTaskHandler}
-                        isFormDisabled={isFormDisabled}
-                        taskData={taskData}
+                        onToggleForm={toggleFormHandler}
+                        onTaskUpdate={updateTaskHandler}
                     />
 
                     <Divider />
 
                     <TaskDetailForm
-                        onPriorityChange={priorityChangeHandler}
+                        groups={groups}
+                        users={users}
+                        categories={categories}
+                        taskData={taskState}
+                        isFormDisabled={isFormDisabled}
                         onCurrentUserChange={currentUserChangeHandler}
                         onCurrentGroupChange={currentGroupChangeHandler}
-                        onCategoryChange={categoryChangeHandler}
-                        onStatusChange={statusChangeHandler}
-                        groups={groupsNamesArr}
-                        users={groupMembersSelectOptions}
-                        categories={categoriesNamesArr}
-                        taskData={taskData}
-                        isFormDisabled={isFormDisabled}
+                        onSelectChange={dispatchTask}
                     />
 
-                    <ResponsesList taskData={taskData} />
+                    <ResponsesList taskData={taskState} />
 
-                    <NewResponse taskData={taskData} onTaskUpdate={updateTaskHandler} />
+                    <NewResponse
+                        taskData={taskState}
+                        onTaskUpdate={updateTaskHandler}
+                    />
+
                 </Paper>
             }
 
-            {!taskData &&
+            {!taskState &&
                 <Typography variant='h5' sx={{ p: 4 }}>
                     Task not found.
                 </Typography>
