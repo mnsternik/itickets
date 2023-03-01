@@ -64,9 +64,13 @@ const TasksTable = (props) => {
     }
     else if (!tasks.length && !error) {
         message = noTasksMessage
-    } else {
+    } else if (sortingItem && sortingOrder) {
         sortedTasks = sortTasks(tasks, sortingOrder, sortingItem);
+    } else {
+        sortedTasks = tasks;
     }
+
+
 
     const tableContent = sortedTasks.map((task) => (
         <StyledTableRow
@@ -77,12 +81,15 @@ const TasksTable = (props) => {
                 cursor: 'pointer'
             }}
         >
-            <StyledTableCell scope="row">{task.title}</StyledTableCell>
-            <StyledTableCell align="center">{task.priority}</StyledTableCell>
-            <StyledTableCell align="center">{task.modificationDate}</StyledTableCell>
-            <StyledTableCell align="center">{task.status}</StyledTableCell>
-            <StyledTableCell align="center">{task.currentUser}</StyledTableCell>
-            <StyledTableCell align="center">{task.currentGroup}</StyledTableCell>
+            {labels.map(label => (
+                <StyledTableCell
+                    align={'center'}
+                    key={label + 'Cell'}
+                >
+                    {task[camelize(label)]}
+                </StyledTableCell>
+            )
+            )}
         </StyledTableRow>
     ));
 
@@ -94,7 +101,7 @@ const TasksTable = (props) => {
     return (
         <>
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                <Table sx={{ minWidth: 800 }} aria-label="customized table">
                     <TableHead>
                         <TableRow>
                             {tableHead}

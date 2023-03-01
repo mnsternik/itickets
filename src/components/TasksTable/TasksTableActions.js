@@ -20,7 +20,7 @@ const TasksTableActions = (props) => {
     if (props.filterOptions.length) {
         filterSelectInput = (
             <SelectInput
-                label='Filter'
+                label={props.filterLabel}
                 structure='objects'
                 options={props.filterOptions}
                 value={props.filterItem.value}
