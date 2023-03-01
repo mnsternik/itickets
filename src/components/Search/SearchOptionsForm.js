@@ -1,13 +1,14 @@
 import { useReducer } from "react";
+import { useSelector } from "react-redux";
 
 import SelectInput from "../../UI/SelectInput";
 
 import { TextField, Stack, Button } from "@mui/material";
 
 const initSearchOptions = {
-    assignedToGroup: '',
-    assignedToUser: '',
-    author: '',
+    currentUserId: '',
+    currentGroup: '',
+    authorId: '',
     category: '',
     priority: '',
     status: '',
@@ -17,22 +18,20 @@ const initSearchOptions = {
 
 const SearchOptionsForm = (props) => {
 
-    const groupsSelectOptions = props.groups.map(group => ({ name: group.name, value: group.id }));
+    const groupsSelectOptions = props.groups.map(group => group.name);
     const usersSelectOptions = props.users.map(user => ({ name: user.name, value: user.uid }));
-    const categoriesSelectOptions = props.categories.map(category => ({ name: category.name, value: category.id }));
-    const prioritesSelectOptions = props.priorites;
-    const statusesSelectOptions = props.statuses;
+    const categoriesSelectOptions = props.categories.map(category => category.name);
+    const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
+    const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(status => status.name);;
 
-    const [searchOptionsState, dispatchSearchOptions] = useReducer((prev, next) => {
-
-        return { ...prev, ...next }
+    const [searchOptionsState, dispatchSearchOptions] = useReducer((state, action) => {
+        return { ...state, ...action }
     }, initSearchOptions)
 
     const submitHandler = (e) => {
         e.preventDefault();
 
-        console.log(searchOptionsState);
-
+        props.onSearchSubmit(searchOptionsState);
     };
 
     return (
@@ -43,73 +42,93 @@ const SearchOptionsForm = (props) => {
             sx={{ width: '80%' }}
         >
 
-            <Stack direction='row' spacing={2} sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                <SelectInput
-                    label='Assigned to group'
-                    options={groupsSelectOptions}
-                    structure='objects'
-                    sx={{ minWidth: 180 }}
-                    onChange={e => dispatchSearchOptions({ assignedToGroup: e.target.value })}
-                />
-
-                <SelectInput
-                    label='Assigned to user'
-                    options={usersSelectOptions}
-                    structure='objects'
-                    sx={{ minWidth: 180 }}
-                    onChange={e => dispatchSearchOptions({ assignedToUser: e.target.value })}
-                />
-
-                <SelectInput
-                    label='Author'
-                    options={usersSelectOptions}
-                    structure='objects'
-                    sx={{ minWidth: 180 }}
-                    onChange={e => dispatchSearchOptions({ author: e.target.value })}
-                />
-            </Stack>
-
-            <Stack direction='row' spacing={2} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+            <Stack direction='row' spacing={1} sx={{ display: 'flex', flexWrap: 'wrap' }}>
                 <SelectInput
                     label='Category'
                     options={categoriesSelectOptions}
-                    structure='objects'
+                    value={searchOptionsState.category}
                     onChange={e => dispatchSearchOptions({ category: e.target.value })}
                 />
 
                 <SelectInput
                     label='Priority'
-                    options={prioritesSelectOptions}
                     structure='objects'
+                    options={prioritiesSelectOptions}
+                    value={searchOptionsState.priority}
                     onChange={e => dispatchSearchOptions({ priority: e.target.value })}
                 />
 
                 <SelectInput
                     label='Statuses'
                     options={statusesSelectOptions}
-                    structure='objects'
+                    value={searchOptionsState.status}
                     onChange={e => dispatchSearchOptions({ status: e.target.value })}
                 />
+            </Stack>
 
+            <Stack direction='row' spacing={1} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                <SelectInput
+                    label='Assigned to group'
+                    options={groupsSelectOptions}
+                    value={searchOptionsState.currentGroup}
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ currentGroup: e.target.value })}
+                />
+
+                <SelectInput
+                    label='Assigned to user'
+                    structure='objects'
+                    options={usersSelectOptions}
+                    value={searchOptionsState.currentUserId}
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ currentUserId: e.target.value })}
+                />
+
+                <SelectInput
+                    label='Author'
+                    structure='objects'
+                    options={usersSelectOptions}
+                    value={searchOptionsState.authorId}
+                    sx={{ minWidth: 180 }}
+                    onChange={e => dispatchSearchOptions({ authorId: e.target.value })}
+                />
+            </Stack>
+
+            <Stack direction='row' spacing={1} sx={{ display: 'flex', flexWrap: 'wrap' }}>
                 <TextField
                     label='Title keywords'
+                    value={searchOptionsState.title}
+                    sx={{ minWidth: 350 }}
                     onChange={e => dispatchSearchOptions({ title: e.target.value })}
                 />
 
                 <TextField
                     label='Description keywords'
+                    value={searchOptionsState.description}
+                    sx={{ minWidth: 350 }}
                     onChange={e => dispatchSearchOptions({ description: e.target.value })}
                 />
             </Stack>
 
-            <Button
-                type='submit'
-                size='large'
-                variant='contained'
-                sx={{ width: 140, }}
-            >
-                Search
-            </Button>
+            <Stack direction='row' spacing={1}>
+                <Button
+                    type='submit'
+                    size='large'
+                    variant='contained'
+                    sx={{ width: 140 }}
+                >
+                    Search
+                </Button>
+
+                <Button
+                    size='large'
+                    variant='outlined'
+                    sx={{ width: 140 }}
+                    onClick={() => dispatchSearchOptions(initSearchOptions)}
+                >
+                    Clear
+                </Button>
+            </Stack>
 
         </Stack>
     )
