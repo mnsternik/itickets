@@ -31,7 +31,7 @@ const SelectInput = (props) => {
 
 
     return (
-        <FormControl sx={{ ...props.sx, minWidth: 120 }}>
+        <FormControl sx={{ ...props.sx, minWidth: 120, width: 'auto' }}>
 
             <InputLabel id={props.labelId || props.label + 'LabelId'}>
                 {props.label}
