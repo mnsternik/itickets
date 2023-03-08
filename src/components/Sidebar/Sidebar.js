@@ -25,10 +25,10 @@ const Sidebar = () => {
   ];
 
   const administrationLinksData = [
+    { text: 'Register user', path: '/register-user' },
     { text: 'Manage users', path: '/manage-users' },
     { text: 'Manage groups ', path: '/manage-groups' },
     { text: 'Manage categories', path: '/manage-categories' }
-
   ];
 
   const toggleSidebar = () => {
