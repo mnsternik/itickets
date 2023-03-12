@@ -16,6 +16,11 @@ const TasksTableActions = (props) => {
         props.onFilterItemChange(newFilter);
     };
 
+    const statusFilterChangeHandler = (event) => {
+        const newStatus = props.statuses.find(item => item.value === event.target.value);
+        props.onStatusFilterChange(newStatus);
+    };
+
     let filterSelectInput;
     if (props.filterOptions.length) {
         filterSelectInput = (
@@ -29,7 +34,6 @@ const TasksTableActions = (props) => {
             />
         )
     }
-
 
     return (
         <Box sx={{
@@ -55,7 +59,18 @@ const TasksTableActions = (props) => {
                 />
             </Box>
 
-            {!props.hideFilter && filterSelectInput}
+            <Box>
+                <SelectInput
+                    label='Status'
+                    structure='objects'
+                    options={props.statuses}
+                    value={props.statusFilter.value}
+                    onChange={statusFilterChangeHandler}
+                    sx={{ mr: 1 }}
+                />
+
+                {!props.hideFilter && filterSelectInput}
+            </Box>
 
         </Box>
     )
