@@ -8,6 +8,7 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 const UserCreatedTasks = () => {
 
     const token = useSelector(state => state.auth.token);
+
     const [userData, setUserData] = useState({ name: '', uid: token });
     const [filterItem, setFilterItem] = useState({ name: userData.name, value: userData.uid });
     const [allUsers, setAllUsers] = useState([]);
@@ -17,10 +18,13 @@ const UserCreatedTasks = () => {
     const [sortingItem, setSortingItem] = useState('Priority');
     const [sortingOrder, setSortingOrder] = useState('Ascending');
 
+    const statuses = useSelector(state => state.tasks.statuses);
+    const [statusFilter, setStatusFilter] = useState({ name: 'Open', value: 'open' })
+
     const labels = ['ID', 'Title', 'Priority', 'Category', 'Status', 'Current user', 'Current group', 'Modification date'];
 
     const allUsersSelectOptions = allUsers.map(user => ({ name: user.name, value: user.uid }));
-    const tasksCreatedByUser = tasks.filter(task => task.authorId === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
+    const tasksCreatedByUser = tasks.filter(task => task.authorId === filterItem.value && task.status === statusFilter.name);
 
     useEffect(() => {
         readAllTasksData(setTasks);
@@ -45,6 +49,10 @@ const UserCreatedTasks = () => {
         setSortingOrder(updatedSortingOrder);
     };
 
+    const statusFilterChangeHandler = (updatedStatus) => {
+        setStatusFilter(updatedStatus);
+    };
+
 
     return (
         <>
@@ -56,17 +64,20 @@ const UserCreatedTasks = () => {
                 filteredKey='author'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}
+                statuses={statuses}
+                statusFilter={statusFilter}
                 onFilterItemChange={filterItemChangeHandler}
                 onSortingItemChange={sortingItemChangeHandler}
                 onSortingOrderChange={sortingOrderChangeHandler}
-
+                onStatusFilterChange={statusFilterChangeHandler}
             />
+
             <TasksTable
                 tasks={tasksCreatedByUser}
                 labels={labels}
                 sortingOrder={sortingOrder}
                 sortingItem={sortingItem}
-                noTasksMessage={`There is no tasks created by user ${filterItem.name}`}
+                noTasksMessage={`There is no tasks with status "${statusFilter.name}" created by user ${filterItem.name}`}
             />
         </>
 

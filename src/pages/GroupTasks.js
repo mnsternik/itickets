@@ -8,6 +8,7 @@ import TasksTableActions from './../components/TasksTable/TasksTableActions';
 const GroupTasks = () => {
 
     const token = useSelector(state => state.auth.token);
+
     const [userData, setUserData] = useState({ name: '', group: '' });
     const [filterItem, setFilterItem] = useState({ name: userData.group, value: userData.group });
     const [allGroups, setAllGroups] = useState([]);
@@ -17,8 +18,12 @@ const GroupTasks = () => {
     const [sortingItem, setSortingItem] = useState('Priority');
     const [sortingOrder, setSortingOrder] = useState('Ascending');
 
+    const statuses = useSelector(state => state.tasks.statuses);
+    const [statusFilter, setStatusFilter] = useState({ name: 'Open', value: 'open' })
+
     const allGroupsSelectOptions = allGroups.map(group => ({ name: group.name, value: group.name }));
-    const userGroupTasks = tasks.filter(task => task.currentGroup === filterItem.value && (task.status !== 'Canceled' && task.status !== 'Closed'));
+
+    const userGroupTasks = tasks.filter(task => task.currentGroup === filterItem.value && task.status === statusFilter.name)
 
     //labels must correspond to tasks properities names, like Current user -> currentUser
     const labels = ['ID', 'Title', 'Priority', 'Category', 'Status', 'Current user', 'Modification date'];
@@ -46,6 +51,10 @@ const GroupTasks = () => {
         setSortingOrder(updatedSortingOrder);
     };
 
+    const statusFilterChangeHandler = (updatedStatus) => {
+        setStatusFilter(updatedStatus);
+    };
+
 
     return (
         <>
@@ -57,10 +66,12 @@ const GroupTasks = () => {
                 filteredKey='currentGroup'
                 sortingItem={sortingItem}
                 sortingOrder={sortingOrder}
+                statuses={statuses}
+                statusFilter={statusFilter}
                 onFilterItemChange={filterItemChangeHandler}
                 onSortingItemChange={sortingItemChangeHandler}
                 onSortingOrderChange={sortingOrderChangeHandler}
-
+                onStatusFilterChange={statusFilterChangeHandler}
             />
 
             <TasksTable
@@ -68,7 +79,7 @@ const GroupTasks = () => {
                 labels={labels}
                 sortingOrder={sortingOrder}
                 sortingItem={sortingItem}
-                noTasksMessage={`There is no tasks assigned to group ${filterItem.name}`}
+                noTasksMessage={`There is no tasks with status "${statusFilter.name}" assigned to group ${filterItem.name}`}
             />
 
         </>
