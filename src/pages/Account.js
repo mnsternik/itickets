@@ -10,11 +10,13 @@ import { Stack } from '@mui/system';
 import { TextField } from '@mui/material';
 
 import { uiActions } from '../store/ui';
+import UserData from '../components/Account/UserData';
 
 
 const Account = () => {
 
     const dispatch = useDispatch();
+
     const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
     const userData = useSelector(state => state.auth.userData);
 
@@ -31,27 +33,7 @@ const Account = () => {
                     User informations
                 </Typography>
 
-                <Stack spacing={2} sx={{ width: 320 }}>
-
-                    <TextField
-                        label='Username'
-                        value={userData.name}
-                        inputProps={{ readOnly: true }}
-                    />
-
-                    <TextField
-                        label='E-mail'
-                        value={userData.email}
-                        inputProps={{ readOnly: true }}
-                    />
-
-                    <TextField
-                        label='Group'
-                        value={userData.group}
-                        inputProps={{ readOnly: true }}
-                    />
-
-                </Stack>
+                <UserData />
 
                 <Typography variant='h5'>
                     Apperance
