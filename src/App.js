@@ -9,6 +9,7 @@ import { authActions } from './store/auth';
 
 import NotFound from './pages/NotFound';
 import SignIn from './pages/SignIn';
+import RegisterUser from './pages/RegisterUser';
 import Sidebar from './components/Sidebar/Sidebar';
 import NewTask from './pages/NewTask';
 import GroupTasks from './pages/GroupTasks';
@@ -84,9 +85,9 @@ const App = () => {
                 <Route path='/manage-categories' element={<ManageCategoriesData />} />
                 <Route path='/manage-groups' element={<ManageGroupsData />} />
                 <Route path='/manage-users' element={<ManageUsersData />} />
+                <Route path='/register-user' element={<RegisterUser />} />
                 <Route path='*' element={<NotFound />} />
               </Route>
-
               <Route element={<RedirectLoggedUser />}>
                 <Route path='/sign-in' element={<SignIn />} />
               </Route>
