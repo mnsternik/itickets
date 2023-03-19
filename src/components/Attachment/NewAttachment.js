@@ -3,22 +3,24 @@ import { useState } from 'react';
 import { storage } from "../../util/firebase";
 import { ref, uploadBytes } from 'firebase/storage';
 
-import { Button, Box } from "@mui/material";
+import { Button, Typography, Stack } from "@mui/material";
 
-const AddAttachment = (props) => {
+const NewAttachment = (props) => {
 
     const [uploadFile, setUploadFile] = useState(null);
 
     const sendFileHandler = () => {
         const storageRef = ref(storage, `${props.taskId}/${uploadFile.name}`);
         uploadBytes(storageRef, uploadFile).then((snapshot) => {
-            console.log('file uploaded')
+            props.onSendFile(snapshot.ref)
+            setUploadFile(null);
         })
     };
 
     return (
-        <Box sx={{ my: 2 }}>
 
+
+        <Stack direction='row' spacing={1} sx={{ my: 1 }}>
             <Button variant="outlined" component="label">
                 Add file
                 <input
@@ -33,13 +35,24 @@ const AddAttachment = (props) => {
                 variant="outlined"
                 disabled={!uploadFile}
                 onClick={sendFileHandler}
+                sx={{ ml: 1 }}
             >
                 Send file
             </Button>
 
-        </Box>
+            <Typography
+                variant='body2'
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                }}
+            >
+                <b>{uploadFile ? uploadFile.name : ' No file chosen'}</b>
+            </Typography>
+        </Stack>
 
     )
 };
 
-export default AddAttachment;
+export default NewAttachment;
