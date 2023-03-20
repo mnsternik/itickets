@@ -22,24 +22,15 @@ import ManageGroupsData from './pages/ManageGroupsData';
 import ManageUsersData from './pages/ManageUsersData';
 import Account from './pages/Account';
 import Bar from './components/Bar/Bar';
+import Theme from './UI/Theme';
 
-
-import { ThemeProvider, createTheme, Container, CssBaseline, Box } from '@mui/material';
-
-
-const darkTheme = createTheme({ palette: { mode: 'dark' } });
-const lightTheme = createTheme({ palette: { mode: 'light' } });
-
+import { Box, Container } from '@mui/material';
 
 const App = () => {
 
   const dispatch = useDispatch();
-
   const token = useSelector(state => state.auth.token);
-
-  const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
-  const theme = isDarkModeEnabled ? darkTheme : lightTheme;
-
+  const userGroup = useSelector(state => state.auth.userData.group)
 
   const dispatchUserData = useCallback((userData) => {
     dispatch(authActions.signIn(userData));
@@ -55,49 +46,43 @@ const App = () => {
     });
   }, [dispatch, dispatchUserData])
 
-
   const PrivateRoutes = () => token ? <Outlet /> : <Navigate to='/sign-in' />
+  const AdminRoutes = () => token && (userGroup === 'Helpdesk') ? <Outlet /> : <Navigate to='/user-tasks' />
   const RedirectLoggedUser = () => token ? <Navigate to='/user-tasks' /> : <Outlet />
 
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline>
+    <Theme>
+      {token && <Bar />}
+      <Box sx={{ display: 'flex' }}>
+        {token && <Sidebar />}
+        <Container>
 
-        {token && <Bar />}
-
-        <Box sx={{ display: 'flex' }}>
-
-          {token && <Sidebar />}
-
-          <Container>
-
-            <Routes>
-              <Route element={<PrivateRoutes />}>
-                <Route path='/' element={<UserTasks />} />
-                <Route path='/newtask' element={<NewTask />} />
-                <Route path='/user-tasks' element={<UserTasks />} />
-                <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
-                <Route path='/group-tasks' element={<GroupTasks />} />
-                <Route path='/tasks/:taskId' element={<TaskDetail />} />
-                <Route path='/search' element={<Search />} />
-                <Route path='/account' element={<Account />} />
+          <Routes>
+            <Route element={<PrivateRoutes />}>
+              <Route path='/' element={<UserTasks />} />
+              <Route path='/newtask' element={<NewTask />} />
+              <Route path='/user-tasks' element={<UserTasks />} />
+              <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
+              <Route path='/group-tasks' element={<GroupTasks />} />
+              <Route path='/tasks/:taskId' element={<TaskDetail />} />
+              <Route path='/search' element={<Search />} />
+              <Route path='/account' element={<Account />} />
+              <Route path='*' element={<NotFound />} />
+              <Route element={<AdminRoutes />}>
                 <Route path='/manage-categories' element={<ManageCategoriesData />} />
                 <Route path='/manage-groups' element={<ManageGroupsData />} />
                 <Route path='/manage-users' element={<ManageUsersData />} />
                 <Route path='/register-user' element={<RegisterUser />} />
-                <Route path='*' element={<NotFound />} />
               </Route>
-              <Route element={<RedirectLoggedUser />}>
-                <Route path='/sign-in' element={<SignIn />} />
-              </Route>
-            </Routes>
+            </Route>
+            <Route element={<RedirectLoggedUser />}>
+              <Route path='/sign-in' element={<SignIn />} />
+            </Route>
+          </Routes>
 
-          </Container>
-        </Box>
-
-      </CssBaseline>
-    </ThemeProvider>
+        </Container>
+      </Box>
+    </Theme>
   );
 };
 
