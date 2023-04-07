@@ -14,7 +14,7 @@ const SidebarSection = (props) => {
                 style={(navData) => navData.isActive ? { backgroundColor: '#1976d2' } : {}}
             >
                 <ListItemIcon>
-                    <MailIcon />
+                    {item.icon}
                 </ListItemIcon>
                 <ListItemText primary={item.text} />
             </ListItemButton>
