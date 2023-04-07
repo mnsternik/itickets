@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { camelize } from '../../lib/api';
 
 import { styled } from '@mui/material/styles';
@@ -22,6 +23,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const TasksTable = (props) => {
 
     const navigate = useNavigate();
+
+    const priorities = useSelector(state => state.tasks.priorities)
 
     const {
         tasks,
@@ -53,6 +56,10 @@ const TasksTable = (props) => {
             sortedTasks : sortedTasks.reverse()
     };
 
+    const getPriorityByValue = (priorityValue) => {
+        const priority = priorities.find(p => p.value === priorityValue);
+        return priority.name
+    };
 
     const rowClickHandler = (taskId) => {
         navigate(`/tasks/${taskId}`);
@@ -70,23 +77,18 @@ const TasksTable = (props) => {
         sortedTasks = tasks;
     }
 
-
-
     const tableContent = sortedTasks.map((task) => (
         <StyledTableRow
             key={task.id}
             onClick={() => rowClickHandler(task.id)}
-            sx={{
-                textDecoration: 'none',
-                cursor: 'pointer'
-            }}
+            sx={{ textDecoration: 'none', cursor: 'pointer' }}
         >
             {labels.map(label => (
                 <StyledTableCell
                     align={'center'}
                     key={label + 'Cell'}
                 >
-                    {task[camelize(label)]}
+                    {label === 'Priority' ? getPriorityByValue(task[camelize(label)]) : task[camelize(label)]}
                 </StyledTableCell>
             )
             )}
