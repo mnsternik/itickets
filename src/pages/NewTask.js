@@ -65,11 +65,18 @@ const NewTask = () => {
 
             <Divider />
 
-            <NewTaskForm categories={categoriesNamesArray} onAddNewTask={addNewTaskHandler} />
+            <NewTaskForm
+                categories={categoriesNamesArray}
+                onAddNewTask={addNewTaskHandler}
+            />
 
-            {alertData.showAlert && <Alert severity="success" onClose={closeAlertHandler} sx={{ mt: 2 }}>
-                Task successfuly created. You can see it <Link style={{ color: 'green' }} to={`/tasks/${alertData.taskId}`}>here</Link>
-            </Alert>}
+            {alertData.showAlert &&
+                <Alert severity="success"
+                    onClose={closeAlertHandler}
+                    sx={{ mt: 2 }}
+                >
+                    Task successfuly created. You can see it <Link style={{ color: 'green' }} to={`/tasks/${alertData.taskId}`}>here</Link>
+                </Alert>}
 
         </Paper>
     )
