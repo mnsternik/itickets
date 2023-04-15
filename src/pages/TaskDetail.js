@@ -8,6 +8,7 @@ import ResponsesList from '../components/Response/ResponsesList';
 import TaskDetailActions from '../components/TaskDetail/TaskDetailActions';
 
 import { Divider, Paper, Typography } from '@mui/material';
+import Attachemnts from '../components/Attachment/Attachments';
 
 
 const initTaskState = {
@@ -113,6 +114,12 @@ const TaskDetail = () => {
                         onCurrentGroupChange={currentGroupChangeHandler}
                         onSelectChange={dispatchTask}
                     />
+
+                    <Divider />
+
+                    <Attachemnts taskId={taskState.id} />
+
+                    <Divider />
 
                     <ResponsesList taskData={taskState} />
 
