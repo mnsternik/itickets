@@ -1,9 +1,8 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Stack, TextField, Button } from '@mui/material';
+import { Stack, TextField, Button, Alert } from '@mui/material';
 import SelectInput from "../../UI/SelectInput";
-
 
 const initTaskState = {
     title: '',
@@ -16,20 +15,33 @@ const NewTaskForm = (props) => {
 
     const priorities = useSelector(state => state.tasks.priorities);
 
-    const [taskState, dispatchTask] = useReducer((prev, next) => {
-        const newTask = { ...prev, ...next }
+    const [taskState, dispatchTask] = useReducer((state, action) => {
+        const newTask = { ...state, ...action }
 
-        if (newTask.priority.length > 0) {
+        if (action.type === 'priority_change') {
             newTask.priority = parseInt(newTask.priority)
         }
 
         return newTask
     }, initTaskState)
 
+    const [showAlert, setShowAlert] = useState(false);
+
 
     const submitHandler = (e) => {
         e.preventDefault();
+
+        //check if all form data is filled 
+        if (Object.values(taskState).some(formItem => formItem.toString().trim() === '')) {
+            setShowAlert(true);
+            return;
+        }
+
+        setShowAlert(false);
+
         props.onAddNewTask(taskState);
+
+        // clear form 
         dispatchTask(initTaskState);
     }
 
@@ -54,23 +66,25 @@ const NewTaskForm = (props) => {
                 onChange={e => dispatchTask({ description: e.target.value })}
             />
 
-            <SelectInput
-                label='Priority'
-                value={taskState.priority}
-                structure='objects'
-                options={priorities}
-                inputProps={{ readOnly: props.isFormDisabled }}
-                sx={{ width: 180 }}
-                onChange={e => dispatchTask({ priority: e.target.value })}
-            />
+            <Stack direction='row' spacing={2}>
+                <SelectInput
+                    label='Priority'
+                    value={taskState.priority}
+                    structure='objects'
+                    options={priorities}
+                    inputProps={{ readOnly: props.isFormDisabled }}
+                    sx={{ width: 180 }}
+                    onChange={e => dispatchTask({ type: 'priority_change', priority: e.target.value })}
+                />
 
-            <SelectInput
-                label='Category'
-                value={taskState.category}
-                options={props.categories}
-                sx={{ width: 180 }}
-                onChange={e => dispatchTask({ category: e.target.value })}
-            />
+                <SelectInput
+                    label='Category'
+                    value={taskState.category}
+                    options={props.categories}
+                    sx={{ width: 180 }}
+                    onChange={e => dispatchTask({ category: e.target.value })}
+                />
+            </Stack>
 
             <Button
                 type='submit'
@@ -80,6 +94,10 @@ const NewTaskForm = (props) => {
             >
                 Send
             </Button>
+
+            {showAlert && <Alert severity="error" onClose={() => setShowAlert(false)} sx={{ mt: 2 }}>
+                All data must be filled
+            </Alert>}
 
         </Stack>
     )
