@@ -22,7 +22,6 @@ const CategoriesList = (props) => {
 
             return (
                 <TableRow key={category.id}>
-
                     <TableCell component="th" scope="row">
                         {category.name}
                     </TableCell>
@@ -34,7 +33,6 @@ const CategoriesList = (props) => {
                     <TableCell align="right">
                         {<Button onClick={() => deleteCategoryHandler(category.id)}>Delete</Button>}
                     </TableCell>
-
                 </TableRow>
             )
         })
