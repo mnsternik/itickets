@@ -19,11 +19,10 @@ const Bar = () => {
             mt: 2,
             mb: 3,
             mr: 5,
-            lineHeight: 40,
             textAlign: 'center'
         }}>
             <Typography variant='subtitle2' sx={{ mr: 2, my: 'auto', fontWeight: '100' }}>
-                Logged as  <strong>{loggedUser}</strong>
+                Logged as {loggedUser}
             </Typography>
 
             <Divider orientation='vertical' />
