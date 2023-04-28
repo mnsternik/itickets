@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Typography } from '@mui/material';
-import MailIcon from '@mui/icons-material/Mail';
 
 const SidebarSection = (props) => {
 
