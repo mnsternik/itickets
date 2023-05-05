@@ -9,6 +9,7 @@ const TaskDetailForm = (props) => {
 
     const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
     const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(s => s.name);
+
     const groupsSelectOptions = props.groups.map(group => group.name)
     const categoriesSelectOptions = props.categories.map(category => category.name);
     const groupMembersSelectOptions = props.users
