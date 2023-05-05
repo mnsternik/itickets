@@ -87,6 +87,7 @@ const TaskDetail = () => {
                         minWidth: 700,
                         minHeight: 800,
                         p: 4,
+                        mb: 4,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-around',
