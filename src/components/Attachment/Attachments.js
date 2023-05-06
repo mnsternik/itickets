@@ -1,65 +1,65 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { storage } from '../../util/firebase';
 import { ref, listAll } from 'firebase/storage';
 
-import AttachemntItem from './AttachemtItem';
+import AttachmentsList from './AttachmentsList';
 import NewAttachment from './NewAttachment';
 
-import { Stack, Button } from '@mui/material';
+import { Stack } from '@mui/material';
 
 
-const Attachemnts = (props) => {
+const Attachments = (props) => {
 
-    const [uploadedFilesList, setUploadedFilesList] = useState([]);
-    const [showFilesList, setShowFilesList] = useState(false);
+    const [filesList, setFilesList] = useState([]);
     const [error, setError] = useState(null);
 
     const { taskId } = props;
 
     useEffect(() => {
-        const storageRef = ref(storage, taskId);
-        listAll(storageRef)
+        const filesRef = ref(storage, taskId);
+        listAll(filesRef)
             .then((res) => {
-                setUploadedFilesList(res.items)
+                setFilesList(res.items)
             }).catch((error) => {
                 setError(error);
             });
     }, [taskId])
 
-    const toggleFilesListHandler = () => {
-        setShowFilesList(show => !show)
+
+    //updates list on client side
+    const addAttachmentHandler = (newAttachment) => {
+        setFilesList([...filesList, newAttachment])
     };
 
-    const updateAttachmentsListHandler = (newAttachment) => {
-        const updatedList = [...uploadedFilesList]
-        updatedList.push(newAttachment);
-        setUploadedFilesList(updatedList);
-        //setUploadedFilesList([...uploadedFilesList, newAttachment])
+    //updates list on client side
+    const deleteAttachmentHandler = (filePath) => {
+        const updatedList = filesList.filter(file => file.fullPath !== filePath)
+        setFilesList(updatedList);
     };
 
-    const filesList = uploadedFilesList.map(file => (
-        <AttachemntItem
-            key={file.name}
-            name={file.name}
-            fullPath={file.fullPath}
-        />
-    ));
+    const errorHandler = useCallback((error) => {
+        setError(error);
+    }, [])
 
     return (
         <Stack spacing={1} sx={{ my: 1 }}>
-            <Button
-                disabled={!filesList.length}
-                onClick={toggleFilesListHandler}
-            >
-                {showFilesList ? 'Hide attachments' : `Show attachments (${filesList.length})`}
-            </Button>
 
-            {showFilesList && filesList}
+            <AttachmentsList
+                files={filesList}
+                onError={errorHandler}
+                onDeleteFile={deleteAttachmentHandler}
+            />
 
-            <NewAttachment taskId={taskId} onSendFile={updateAttachmentsListHandler} />
+            <NewAttachment
+                taskId={taskId}
+                onError={errorHandler}
+                onSendFile={addAttachmentHandler}
+            />
+
+            {error}
 
         </Stack>
     )
 }
 
-export default Attachemnts;
+export default Attachments;
