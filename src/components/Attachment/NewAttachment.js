@@ -3,15 +3,25 @@ import { useState } from 'react';
 import { storage } from "../../util/firebase";
 import { ref, uploadBytes } from 'firebase/storage';
 
+import { useSelector } from 'react-redux';
+
 import { Button, Typography, Stack } from "@mui/material";
 
 const NewAttachment = (props) => {
+
+    const loggedUserId = useSelector(state => state.auth.userData.uid);
 
     const [uploadFile, setUploadFile] = useState(null);
 
     const sendFileHandler = () => {
         const storageRef = ref(storage, `${props.taskId}/${uploadFile.name}`);
-        uploadBytes(storageRef, uploadFile).then((snapshot) => {
+        const metadata = {
+            customMetadata: {
+                author: loggedUserId
+            }
+        };
+
+        uploadBytes(storageRef, uploadFile, metadata).then((snapshot) => {
             props.onSendFile(snapshot.ref)
             setUploadFile(null);
         })
