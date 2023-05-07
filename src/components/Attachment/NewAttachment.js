@@ -9,15 +9,25 @@ import { Button, Typography, Stack } from "@mui/material";
 
 const NewAttachment = (props) => {
 
-    const loggedUserId = useSelector(state => state.auth.userData.uid);
+    const loggedUserData = useSelector(state => state.auth.userData);
 
     const [uploadFile, setUploadFile] = useState(null);
+
+    const dateFormatter = new Intl.DateTimeFormat('en', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+    });
 
     const sendFileHandler = () => {
         const storageRef = ref(storage, `${props.taskId}/${uploadFile.name}`);
         const metadata = {
             customMetadata: {
-                author: loggedUserId
+                authorId: loggedUserData.uid,
+                authorName: loggedUserData.name,
+                uploadDate: dateFormatter.format(new Date())
             }
         };
 
@@ -28,8 +38,6 @@ const NewAttachment = (props) => {
     };
 
     return (
-
-
         <Stack direction='row' spacing={1} sx={{ my: 1 }}>
             <Button variant="outlined" component="label">
                 Add file
