@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging"
+import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
@@ -14,12 +14,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
-
-getToken(messaging, { vapidKey: 'BKqeXL-69gLIEyPgwgQ4QP1EwOLZP5BuaEsteo9UyWITVDYqhBuDvXdceQ6ZlR3KAzRnMdM-KO9GEvCSHs66ELc' })
-    .then(currentToken => {
-        console.log(currentToken);
-    })
 
 export const auth = getAuth(app);
 export const db = getDatabase(app);
+export const storage = getStorage(app);
