@@ -22,10 +22,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const TasksTable = (props) => {
 
-    const navigate = useNavigate();
-
-    const priorities = useSelector(state => state.tasks.priorities)
-
     const {
         tasks,
         labels,
@@ -35,10 +31,14 @@ const TasksTable = (props) => {
         noTasksMessage
     } = props;
 
-    let sortedTasks = [];
+    const navigate = useNavigate();
 
+    const priorities = useSelector(state => state.tasks.priorities)
+
+
+    let sortedTasks = [];
     const sortTasks = (tasks, sortingOrder, sortingItem) => {
-        const sortedTasks = structuredClone(tasks);
+        const sortedTasks = [...tasks];
         const sortingKey = camelize(sortingItem);
         const sortingKeyDataType = typeof tasks[0][sortingKey];
 
@@ -90,8 +90,7 @@ const TasksTable = (props) => {
                 >
                     {label === 'Priority' ? getPriorityByValue(task[camelize(label)]) : task[camelize(label)]}
                 </StyledTableCell>
-            )
-            )}
+            ))}
         </StyledTableRow>
     ));
 
