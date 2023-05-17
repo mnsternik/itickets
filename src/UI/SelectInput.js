@@ -31,15 +31,21 @@ const SelectInput = (props) => {
 
 
     return (
-        <FormControl sx={{ ...props.sx, minWidth: 120, width: 'auto' }}>
+        <FormControl
+            sx={{ ...props.sx, minWidth: 120, width: 'auto' }}
+            id={props.label + '-select-form-control-id'}
+        >
 
-            <InputLabel id={props.labelId || props.label + 'LabelId'}>
+            <InputLabel
+                id={props.label + '-select-label-id'}
+                htmlFor={props.label + '-select-id'}
+            >
                 {props.label}
             </InputLabel>
 
             <Select
-                labelId={props.labelId || props.label + 'LabelId'}
-                id={props.id || props.label + 'Id'}
+                id={props.label + '-select-id'}
+                aria-label={props.label}
                 defaultValue=''
                 size={props.size || 'medium'}
                 {...props}
