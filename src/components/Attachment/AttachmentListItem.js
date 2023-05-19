@@ -13,7 +13,6 @@ const AttachmentListItem = (props) => {
     const [fileUrl, setFileUrl] = useState('');
     const [fileSize, setFileSize] = useState();
     const [customMetadata, setCustomMetadata] = useState({});
-    // this could be done be reducer
 
     const { fullPath: filePath, onError } = props;
 

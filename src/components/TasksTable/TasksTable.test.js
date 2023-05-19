@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { renderWithProviders } from "../../util/test-utils";
 import { camelize } from "../../lib/api";
-import TasksTable from "./TasksTable";
+import TasksTable from "./TasksTable2";
 
 describe('TasksTable component ', () => {
 

@@ -25,6 +25,8 @@ const TasksTable = (props) => {
     const {
         tasks,
         labels,
+        sortingOrder,
+        sortingItem,
         error,
         noTasksMessage
     } = props;
@@ -32,6 +34,27 @@ const TasksTable = (props) => {
     const navigate = useNavigate();
 
     const priorities = useSelector(state => state.tasks.priorities)
+
+
+    let sortedTasks = [];
+    const sortTasks = (tasks, sortingOrder, sortingItem) => {
+        const sortedTasks = [...tasks];
+        const sortingKey = camelize(sortingItem);
+        const sortingKeyDataType = typeof tasks[0][sortingKey];
+
+        if (sortingKeyDataType === 'string') {
+            sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
+        }
+        else if (sortingKeyDataType === 'number') {
+            sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
+        }
+        else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
+            sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
+        }
+
+        return sortingOrder === 'Ascending' ?
+            sortedTasks : sortedTasks.reverse()
+    };
 
     const getPriorityByValue = (priorityValue) => {
         const priority = priorities.find(p => p.value === priorityValue);
@@ -42,18 +65,19 @@ const TasksTable = (props) => {
         navigate(`/tasks/${taskId}`);
     };
 
-    let sortedTasks;
     let message;
     if (error) {
         message = 'Failed to fetched content.';
     }
     else if (!tasks.length && !error) {
         message = noTasksMessage
+    } else if (sortingItem && sortingOrder) {
+        sortedTasks = sortTasks(tasks, sortingOrder, sortingItem);
     } else {
         sortedTasks = tasks;
     }
 
-    const tableContent = tasks.map((task) => (
+    const tableContent = sortedTasks.map((task) => (
         <StyledTableRow
             key={task.id}
             onClick={() => rowClickHandler(task.id)}

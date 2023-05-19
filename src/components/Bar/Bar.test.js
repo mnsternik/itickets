@@ -21,7 +21,7 @@ describe('Bar component', () => {
 
     test('should display correct username from Redux store', () => {
         render(
-            <Provider store={mockStore}>
+            <Provider store={mockStore()}>
                 <Bar />
             </Provider>
         )

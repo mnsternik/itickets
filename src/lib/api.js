@@ -1,5 +1,5 @@
 import { ref, set, get, onValue, push, child } from 'firebase/database';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "firebase/auth";
 import { db, auth } from '../util/firebase';
 
 
@@ -64,6 +64,17 @@ export function signUserIn(email, password, setError) {
                 setError("Authentication error");
             }
         });
+};
+
+
+export function updateUserPassword(newPassword, setError, setShowAlert) {
+    const user = auth.currentUser;
+    updatePassword(user, newPassword).then(() => {
+        setShowAlert(true);
+    }).catch((error) => {
+        setError(error);
+        setShowAlert(true);
+    });
 };
 
 

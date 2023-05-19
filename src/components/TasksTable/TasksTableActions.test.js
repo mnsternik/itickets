@@ -1,5 +1,5 @@
 import { screen, render } from "@testing-library/react";
-import TasksTableActions from "./TasksTableActions";
+import TasksTableActions from "./TasksTableActions2";
 
 describe('TasksTableActions component', () => {
 

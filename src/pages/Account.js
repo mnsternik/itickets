@@ -7,10 +7,10 @@ import Switch from '@mui/material/Switch';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Stack } from '@mui/system';
-import { TextField } from '@mui/material';
 
 import { uiActions } from '../store/ui';
 import UserData from '../components/Account/UserData';
+
 
 
 const Account = () => {
@@ -18,7 +18,6 @@ const Account = () => {
     const dispatch = useDispatch();
 
     const isDarkModeEnabled = useSelector(state => state.ui.isDarkModeEnabled);
-    const userData = useSelector(state => state.auth.userData);
 
     const handleChange = () => {
         dispatch(uiActions.toggleDarkMode())
@@ -26,7 +25,6 @@ const Account = () => {
 
     return (
         <Paper sx={{ p: 3 }}>
-
             <Stack spacing={4}>
 
                 <Typography variant='h5'>
@@ -44,19 +42,18 @@ const Account = () => {
                     variant="standard"
                     sx={{ m: 2 }}
                 >
-
-                    <FormLabel component="legend">{isDarkModeEnabled ? 'Enabled' : 'Disabled'}</FormLabel>
+                    <FormLabel component="legend">
+                        {isDarkModeEnabled ? 'Enabled' : 'Disabled'}
+                    </FormLabel>
                     <FormControlLabel
                         label="Dark Mode"
                         control={
                             <Switch checked={isDarkModeEnabled} onChange={handleChange} name="darkMode" />
                         }
                     />
-
                 </FormControl>
 
             </Stack>
-
         </Paper>
     );
 };

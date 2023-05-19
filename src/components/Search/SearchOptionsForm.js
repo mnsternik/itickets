@@ -38,7 +38,7 @@ const SearchOptionsForm = (props) => {
         <Stack
             component={'form'}
             onSubmit={submitHandler}
-            spacing={2}
+            spacing={1}
             sx={{ width: '80%' }}
         >
 
@@ -59,7 +59,7 @@ const SearchOptionsForm = (props) => {
                 />
 
                 <SelectInput
-                    label='Statuses'
+                    label='Status'
                     options={statusesSelectOptions}
                     value={searchOptionsState.status}
                     onChange={e => dispatchSearchOptions({ status: e.target.value })}

@@ -36,7 +36,7 @@ const Search = () => {
             }
         })
 
-        // all searched words must be included in string
+        // all searched words must be included in result 
         if (score === wordsArr.length) {
             return true;
         }

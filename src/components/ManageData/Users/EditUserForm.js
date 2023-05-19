@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useReducer } from 'react';
 import { updateUserData } from '../../../lib/api';
 
 import SelectInput from '../../../UI/SelectInput';
@@ -6,77 +6,54 @@ import SelectInput from '../../../UI/SelectInput';
 import { Stack, Typography, Button, TextField, Divider, Alert } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
+const initUserState = {
+    uid: '',
+    name: '',
+    email: '',
+    group: '',
+};
 
 const EditUserForm = (props) => {
-
-    const [selectedUserId, setSelectedUserId] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [group, setGroup] = useState('');
 
     const [isFormReadOnly, setIsFormReadOnly] = useState(true);
     const [isFormTouched, setIsFormTouched] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [error, setError] = useState(null);
 
+    const [userState, dispatchFormData] = useReducer((state, action) => {
+        if (action.type === 'selected_user_change') {
+            setIsFormReadOnly(true);
+            setIsFormTouched(false);
+        } else {
+            setIsFormTouched(true);
+        }
+
+        return { ...state, ...action.payload }
+    }, initUserState)
+
     const alertMessage = error ? error : 'User updated successfully';
 
     const allUsersSelectOptions = props.allUsers.map(user => ({ name: user.name, value: user.uid }))
 
-
     const selectedUserChangeHandler = (event) => {
         const selectedUser = props.allUsers.find(user => user.uid === event.target.value);
-
-        setIsFormReadOnly(true);
-        setIsFormTouched(false);
-
-        setSelectedUserId(selectedUser.uid);
-        setEmail(selectedUser.email);
-        setUsername(selectedUser.name);
-        setGroup(selectedUser.group);
-    };
-
-    const usernameInputChangeHandler = (event) => {
-        setUsername(event.target.value);
-        setIsFormTouched(true);
-    };
-
-    const emailInputChangeHandler = (event) => {
-        setEmail(event.target.value);
-        setIsFormTouched(true);
-    };
-
-    const groupSelectChangeHandler = (event) => {
-        setGroup(event.target.value);
-        setIsFormTouched(true);
-    };
-
-    const toggleFormHandler = () => {
-        setIsFormReadOnly(prevState => !prevState);
-    };
-
-    const closeAlertHandler = () => {
-        setShowAlert(false)
+        dispatchFormData({ payload: selectedUser, type: 'selected_user_change' })
     };
 
     const cancelClickHandler = () => {
-        setIsFormReadOnly(true);
-        setIsFormTouched(false);
-        setUsername('');
-        setEmail('');
-        setGroup('');
+        dispatchFormData({ payload: initUserState, type: 'selected_user_change' })
     };
 
     const validateUserData = () => {
-        if (username.trim() === '') {
+        if (userState.name.trim() === '') {
             setError('Username cannot be empty');
             return false;
         }
-        else if (email.trim() === '') {
+        else if (userState.email.trim() === '') {
             setError('Email cannot be empty');
             return false;
         }
-        else if (!email.includes('@')) {
+        else if (!userState.email.includes('@')) {
             setError('Invalid e-mail address')
             return false;
         }
@@ -92,21 +69,14 @@ const EditUserForm = (props) => {
             return;
         }
 
-        const updatedUserData = {
-            uid: selectedUserId,
-            name: username,
-            email: email,
-            group: group,
-        };
-
-        updateUserData(updatedUserData, setError)
+        updateUserData(userState, setError)
 
         if (error) {
             setShowAlert(true)
             return;
         }
 
-        toggleFormHandler();
+        setIsFormReadOnly(true);
         setShowAlert(true);
     };
 
@@ -121,7 +91,7 @@ const EditUserForm = (props) => {
                 label='Select user'
                 structure='objects'
                 options={allUsersSelectOptions}
-                value={selectedUserId}
+                value={userState.uid}
                 onChange={selectedUserChangeHandler}
             />
 
@@ -131,26 +101,26 @@ const EditUserForm = (props) => {
 
                 <TextField
                     label='Username'
-                    value={username}
-                    onChange={usernameInputChangeHandler}
+                    value={userState.name}
                     inputProps={{ disabled: isFormReadOnly }}
                     disabled={isFormReadOnly}
+                    onChange={e => dispatchFormData({ payload: { name: e.target.value } })}
                 />
 
                 <TextField
                     label='E-mail'
-                    value={email}
-                    onChange={emailInputChangeHandler}
+                    value={userState.email}
                     disabled={isFormReadOnly}
+                    onChange={e => dispatchFormData({ payload: { email: e.target.value } })}
                 />
 
                 <SelectInput
                     label='Group'
-                    value={group}
-                    onChange={groupSelectChangeHandler}
+                    value={userState.group}
                     options={props.groups}
                     disabled={isFormReadOnly}
                     IconComponent={isFormReadOnly ? '' : ArrowDropDownIcon}
+                    onChange={e => dispatchFormData({ payload: { group: e.target.value } })}
                 />
 
 
@@ -169,8 +139,8 @@ const EditUserForm = (props) => {
                     {isFormReadOnly && <Button
                         variant={'contained'}
                         size='large'
-                        disabled={!selectedUserId}
-                        onClick={toggleFormHandler}
+                        disabled={!userState.uid}
+                        onClick={() => setIsFormReadOnly(isReadOnly => !isReadOnly)}
                     >
                         Edit
                     </Button>}
@@ -179,9 +149,12 @@ const EditUserForm = (props) => {
                         Cancel
                     </Button>}
 
+
                 </Stack>
 
-                {showAlert && <Alert severity={error ? 'error' : 'success'} onClose={closeAlertHandler}>
+                {userState.uid && <Button variant='outlined'>Send password reset email</Button>}
+
+                {showAlert && <Alert severity={error ? 'error' : 'success'} onClose={() => setShowAlert(false)}>
                     {alertMessage}
                 </Alert>}
 
