@@ -8,16 +8,21 @@ import SelectInput from '../../UI/SelectInput';
 const TasksTableActions = (props) => {
 
     const statusOptions = useSelector(state => state.tasks.statuses);
+    //const filterDefaultValue = useSelector(state => state.auth.userData.uid);
 
-    const { tasks } = props.tableData;
-    const { filteredProperty } = props.actionsFilterData;
     const { updateTableData } = props;
+    const { tasks } = props.tableData;
+    const {
+        filteredProperty,
+        defaultValue: defaultFilterValue,
+        options: viewFilterOptions
+    } = props.filterData;
 
     const initActionsState = {
         sortingItem: 'Priority',
         sortingOrder: 'Ascending',
         statusFilter: 'Open',
-        viewFilter: props.defaultViewFilter,
+        viewFilterValue: defaultFilterValue,
     };
 
     const [actionsState, dispatchActionsState] = useReducer((state, action) => {
@@ -25,6 +30,7 @@ const TasksTableActions = (props) => {
         if (action.type === 'SORTING_ORDER') {
             updatedState.sortingOrder = state.sortingOrder === 'Ascending' ? 'Descending' : 'Ascending';
         }
+        console.log(updatedState);
         return updatedState;
     }, initActionsState);
 
@@ -57,6 +63,13 @@ const TasksTableActions = (props) => {
     }, []);
 
     useEffect(() => {
+        dispatchActionsState({
+            viewFilterValue: defaultFilterValue,
+            viewFilterOptions: viewFilterOptions
+        })
+    }, [defaultFilterValue, viewFilterOptions])
+
+    useEffect(() => {
         if (tasks.length) {
             const tasksFilteredByStatus = filterTasksByStatus(tasks, actionsState.status);
             const tasksFilteredByView = filterTasksByViewProp(tasksFilteredByStatus, actionsState.viewFilter, filteredProperty);
@@ -77,7 +90,7 @@ const TasksTableActions = (props) => {
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <SelectInput
                     label='Sort by'
-                    options={['Priority', 'Create date', 'Modification date', 'Create date', 'Author', 'Category']}
+                    options={['Priority', 'Create date', 'Modification date', 'Author', 'Category']}
                     value={actionsState.sortingItem}
                     onChange={(e) => dispatchActionsState({ sortingItem: e.target.value })}
                     sx={{ mr: 1 }}
@@ -87,7 +100,7 @@ const TasksTableActions = (props) => {
                     label='Order'
                     options={['Ascending', 'Descending']}
                     value={actionsState.sortingOrder}
-                    onChange={(e) => dispatchActionsState({ sortingItem: e.target.value })}
+                    onChange={(e) => dispatchActionsState({ sortingOrder: e.target.value })}
                 />
             </Box>
 
@@ -96,17 +109,19 @@ const TasksTableActions = (props) => {
                     label='Status'
                     options={statusOptions}
                     value={actionsState.statusFilter}
-                    onChange={(e) => dispatchActionsState({ sortingItem: e.target.value })}
+                    onChange={(e) => dispatchActionsState({ statusFilter: e.target.value })}
                     sx={{ mr: 1 }}
+
                 />
+                <button onClick={() => console.log(actionsState)}>CLICK</button>
                 {
                     //props is used here!!
                 }
                 {<SelectInput
                     structure='objects'
-                    label={props.actionsFilterData.label}
-                    options={props.actionsFilterData.options}
-                    value={actionsState.viewFilter}
+                    label={props.filterData.label}
+                    options={viewFilterOptions}
+                    value={actionsState.viewFilterValue}
                     onChange={(e) => dispatchActionsState({ viewFilter: e.target.value })}
                 />}
             </Box>

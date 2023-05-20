@@ -24,6 +24,8 @@ import Account from './pages/Account';
 import Bar from './components/Bar/Bar';
 import Theme from './UI/Theme';
 
+import TasksViews from './pages/TasksViews';
+
 import { Box, Container } from '@mui/material';
 
 const App = () => {
@@ -59,11 +61,11 @@ const App = () => {
 
           <Routes>
             <Route element={<PrivateRoutes />}>
-              <Route path='/' element={<UserTasks />} />
+              <Route path='/' element={<TasksViews />} />
               <Route path='/newtask' element={<NewTask />} />
-              <Route path='/user-tasks' element={<UserTasks />} />
-              <Route path='/user-created-tasks' element={<UserCreatedTasks />} />
-              <Route path='/group-tasks' element={<GroupTasks />} />
+              <Route path='/user-tasks' element={<TasksViews />} />
+              <Route path='/user-created-tasks' element={<TasksViews />} />
+              <Route path='/group-tasks' element={<TasksViews />} />
               <Route path='/tasks/:taskId' element={<TaskDetail />} />
               <Route path='/search' element={<Search />} />
               <Route path='/account' element={<Account />} />

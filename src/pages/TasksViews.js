@@ -17,18 +17,18 @@ const TasksViews = () => {
         label: '',
         filteredProperty: '',
         defaultValue: '',
-        options: ''
+        options: []
     };
 
     const [actionsFilterState, dispatchActionsFilterState] = useReducer((state, action) => {
         const updatedState = { ...state, ...action }
         if (action.type === 'OPTIONS_GROUPS') {
-            updatedState.options = action.payload.map(group => ({
+            updatedState.options = action.options.map(group => ({
                 name: group.name,
                 value: group.name
             }))
         } else if (action.type === 'OPTIONS_USERS') {
-            updatedState.options = action.payload.map(user => ({
+            updatedState.options = action.options.map(user => ({
                 name: user.name,
                 value: user.uid
             }))
@@ -48,32 +48,37 @@ const TasksViews = () => {
         return { ...state, ...action }
     }, initTableState);
 
-    // usePArams path to consider
-    if (viewType === '/group-task') {
-        dispatchActionsFilterState({
-            label: 'Assigned to group',
-            filteredProperty: 'currentGroup',
-            defaultValue: { name: userData.group, value: userData.group }
-        })
-    } else if (viewType === '/user-tasks') {
-        dispatchActionsFilterState({
-            label: 'Assigned to user',
-            filteredProperty: 'currentUserId',
-            defaultValue: { name: userData.name, value: userData.uid }
-        })
-    } else if (viewType === '/user-created-tasks') {
-        dispatchActionsFilterState({
-            label: 'Created by user',
-            filteredProperty: 'authorId',
-            defaultValue: { name: userData.name, value: userData.uid }
-        })
-    }
-
     useEffect(() => {
         readAllTasksData((tasks) => dispatchTableState({
             tasks: tasks
         }));
-        if (viewType === '/group-task') {
+    }, [])
+
+    useEffect(() => {
+        if (viewType === '/group-tasks') {
+            dispatchActionsFilterState({
+                label: 'Assigned to group',
+                filteredProperty: 'currentGroup',
+                defaultValue: userData.group
+            })
+        } else if (viewType === '/user-tasks') {
+            console.log('dispatched')
+            dispatchActionsFilterState({
+                label: 'Assigned to user',
+                filteredProperty: 'currentUserId',
+                defaultValue: userData.uid
+            })
+        } else if (viewType === '/user-created-tasks') {
+            dispatchActionsFilterState({
+                label: 'Created by user',
+                filteredProperty: 'authorId',
+                defaultValue: userData.uid
+            })
+        }
+    }, [viewType, userData.uid, userData.group])
+
+    useEffect(() => {
+        if (viewType === '/group-tasks') {
             readAllGroupsData((groups) => dispatchActionsFilterState({
                 type: 'OPTIONS_GROUPS',
                 options: groups
@@ -90,12 +95,12 @@ const TasksViews = () => {
     return (
         <>
             <TasksTableActions
-                actionsFilterData={actionsFilterState}
+                filterData={actionsFilterState}
                 tableData={tableState}
                 updateTableData={dispatchTableState}
             />
 
-            <button onClick={() => console.log(actionsFilterState)}>LOG IT</button>
+            <button onClick={() => console.log(actionsFilterState)}>LOGGGG</button>
 
             <TasksTable
                 tasks={tableState.tasks}
