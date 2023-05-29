@@ -48,12 +48,10 @@ const EditUserForm = (props) => {
         if (userState.name.trim() === '') {
             setError('Username cannot be empty');
             return false;
-        }
-        else if (userState.email.trim() === '') {
+        } else if (userState.email.trim() === '') {
             setError('Email cannot be empty');
             return false;
-        }
-        else if (!userState.email.includes('@')) {
+        } else if (!userState.email.includes('@')) {
             setError('Invalid e-mail address')
             return false;
         }
@@ -63,19 +61,15 @@ const EditUserForm = (props) => {
     const submitHandler = (event) => {
         event.preventDefault();
         setError(null);
-
         if (!validateUserData()) {
             setShowAlert(true);
             return;
         }
-
         updateUserData(userState, setError)
-
         if (error) {
             setShowAlert(true)
             return;
         }
-
         setIsFormReadOnly(true);
         setShowAlert(true);
     };
@@ -148,7 +142,6 @@ const EditUserForm = (props) => {
                     {!isFormReadOnly && <Button onClick={cancelClickHandler} size='large'>
                         Cancel
                     </Button>}
-
 
                 </Stack>
 
