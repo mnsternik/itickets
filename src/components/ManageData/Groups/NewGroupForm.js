@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { writeNewGroupData, camelize } from "../../../lib/api";
 
-import { Box, TextField, Button, Alert, Stack } from "@mui/material"
+import { Box, TextField, Button, Alert, Stack, Checkbox, FormControlLabel } from "@mui/material"
 
 const NewGroupForm = () => {
 
     const [groupName, setGroupName] = useState('');
+    const [adminCheckboxChecked, setAdminCheckboxChecked] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [error, setError] = useState(null);
 
@@ -15,6 +16,10 @@ const NewGroupForm = () => {
     const groupNameChangeHandler = (event) => {
         setGroupName(event.target.value)
     };
+
+    const checkboxChangeHandler = (event) => {
+        setAdminCheckboxChecked(checked => !checked);
+    }
 
     const closeAlertHandler = () => {
         setShowAlert(false);
@@ -27,6 +32,7 @@ const NewGroupForm = () => {
         const newGroup = {
             id: camelize(groupName),
             name: groupName,
+            role: adminCheckboxChecked ? 'admin' : 'user',
         };
 
         writeNewGroupData(newGroup, setError, setGroupName);
@@ -38,14 +44,6 @@ const NewGroupForm = () => {
 
             <Box component='form' onSubmit={submitHandler} sx={{ display: 'flex' }}>
 
-                <TextField
-                    label={'New group name'}
-                    variant="outlined"
-                    value={groupName}
-                    onChange={groupNameChangeHandler}
-                    sx={{ width: 320, my: 1, mr: 3 }}
-                />
-
                 <Button
                     variant='contained'
                     type='submit'
@@ -55,6 +53,19 @@ const NewGroupForm = () => {
                 >
                     Add
                 </Button>
+
+                <TextField
+                    label={'New group name'}
+                    variant="outlined"
+                    value={groupName}
+                    onChange={groupNameChangeHandler}
+                    sx={{ width: 320, my: 1, mx: 3 }}
+                />
+
+                <FormControlLabel
+                    label="Administrator role"
+                    control={<Checkbox checked={adminCheckboxChecked} onChange={checkboxChangeHandler} />}
+                />
 
             </Box>
 
