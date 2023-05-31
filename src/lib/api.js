@@ -30,14 +30,11 @@ export function writeNewUserData(userData, password, setError, clearForm) {
         .catch((error) => {
             if (error.code === 'auth/email-already-in-use') {
                 setError('E-mail already in use')
-            }
-            else if (error.code === 'auth/weak-password') {
+            } else if (error.code === 'auth/weak-password') {
                 setError('Password must be at least 6 characters long')
-            }
-            else if (error.code === 'auth/invalid-email') {
+            } else if (error.code === 'auth/invalid-email') {
                 setError('Inavlid e-mail address')
-            }
-            else {
+            } else {
                 setError('Authentication error. Try again later. ');
             }
             return error;
