@@ -44,28 +44,30 @@ const NewGroupForm = () => {
 
             <Box component='form' onSubmit={submitHandler} sx={{ display: 'flex' }}>
 
+                <Stack>
+                    <TextField
+                        label={'New group name'}
+                        variant="outlined"
+                        value={groupName}
+                        onChange={groupNameChangeHandler}
+                        sx={{ width: 320, my: 1, mr: 2 }}
+                    />
+
+                    <FormControlLabel
+                        label="Administrator role"
+                        control={<Checkbox checked={adminCheckboxChecked} onChange={checkboxChangeHandler} />}
+                    />
+                </Stack>
+
                 <Button
                     variant='contained'
                     type='submit'
                     size='large'
                     disabled={isAddButtonDisabled}
-                    sx={{ my: "auto" }}
+                    sx={{ mt: 1, height: 54 }}
                 >
                     Add
                 </Button>
-
-                <TextField
-                    label={'New group name'}
-                    variant="outlined"
-                    value={groupName}
-                    onChange={groupNameChangeHandler}
-                    sx={{ width: 320, my: 1, mx: 3 }}
-                />
-
-                <FormControlLabel
-                    label="Administrator role"
-                    control={<Checkbox checked={adminCheckboxChecked} onChange={checkboxChangeHandler} />}
-                />
 
             </Box>
 
