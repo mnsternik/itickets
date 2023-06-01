@@ -5,8 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import AuthProvider from './providers/AuthProvider';
 import { setupStore } from './store';
 import App from './App';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const store = setupStore();
@@ -27,4 +26,5 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-
+import './index.css';
+import reportWebVitals from './reportWebVitals';
