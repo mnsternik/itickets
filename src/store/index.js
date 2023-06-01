@@ -9,6 +9,7 @@ const rootReducer = combineReducers({
     tasks: tasksRedcuder,
     ui: uiReducer,
 });
+});
 
 export const setupStore = preloadedState => {
     return configureStore({

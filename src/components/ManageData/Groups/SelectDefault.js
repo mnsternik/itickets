@@ -7,7 +7,7 @@ import { Box, Button, Alert } from "@mui/material";
 
 const SelectDefault = (props) => {
 
-    const [defaultGroup, setDefaultGroup] = useState({});
+    const [defaultGroup, setDefaultGroup] = useState({ name: '', id: '' });
     const [showAlert, setShowAlert] = useState(false);
 
     const groupsSelectOptions = props.groupsData.map(group => ({ value: group.id, name: group.name }));
@@ -17,12 +17,16 @@ const SelectDefault = (props) => {
     }, [])
 
     const defaultGroupChangeHandler = (event) => {
-        setDefaultGroup(event.target.value);
+        setDefaultGroup({ id: event.target.value });
     };
 
     const submitHandler = (event) => {
         event.preventDefault();
-        writeDefaultAssignedGroup(defaultGroup);
+        const selectedGroupData = props.groupsData.find(group => group.id === defaultGroup.id);
+        writeDefaultAssignedGroup({
+            id: selectedGroupData.id,
+            name: selectedGroupData.name
+        });
         setShowAlert(true);
     };
 
@@ -31,7 +35,7 @@ const SelectDefault = (props) => {
             <SelectInput
                 label='Default assigned group'
                 structure='objects'
-                value={defaultGroup}
+                value={defaultGroup.id}
                 options={groupsSelectOptions}
                 onChange={defaultGroupChangeHandler}
                 sx={{ width: 320, mr: 2 }}
