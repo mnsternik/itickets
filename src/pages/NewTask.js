@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { readCategoriesData, readNewTaskId, writeNewTaskData } from '../lib/api';
+import { readCategoriesData, readDefaultAssignedGroup, readNewTaskId, writeNewTaskData } from '../lib/api';
 
 import NewTaskForm from '../components/NewTask/NewTaskForm';
 
@@ -13,6 +13,7 @@ const NewTask = () => {
     const userData = useSelector(state => state.auth.userData);
 
     const [newTaskId, setNewTaskId] = useState('');
+    const [defaultAssignedGroup, setDefaultAssignedGroup] = useState({})
     const [categories, setCategories] = useState([]);
 
     const [alertData, setAlertData] = useState({ showAlert: false, taskId: '' });
@@ -23,6 +24,7 @@ const NewTask = () => {
     useEffect(() => {
         readNewTaskId(setNewTaskId);
         readCategoriesData(setCategories);
+        readDefaultAssignedGroup(setDefaultAssignedGroup);
     }, [])
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -48,7 +50,7 @@ const NewTask = () => {
             status: 'Open',
             currentUserId: null,
             currentUser: null,
-            currentGroup: 'Helpdesk',
+            currentGroup: defaultAssignedGroup.name
         };
 
         writeNewTaskData(newTask);
