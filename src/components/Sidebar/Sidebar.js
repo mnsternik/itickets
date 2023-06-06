@@ -13,6 +13,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import CategoryIcon from '@mui/icons-material/Category';
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 const Sidebar = () => {
 
@@ -39,7 +40,8 @@ const Sidebar = () => {
     { text: 'Register user', path: '/register-user', icon: <PersonAddIcon color='primary' /> },
     { text: 'Manage users', path: '/manage-users', icon: <ManageAccountsIcon color='primary' /> },
     { text: 'Manage groups ', path: '/manage-groups', icon: <GroupAddIcon color='primary' /> },
-    { text: 'Manage categories', path: '/manage-categories', icon: <CategoryIcon color='primary' /> }
+    { text: 'Manage categories', path: '/manage-categories', icon: <CategoryIcon color='primary' /> },
+    { text: 'Archiving', path: '/archiving', icon: <ArchiveIcon color='primary' /> }
   ];
 
   const toggleSidebar = () => {
