@@ -1,9 +1,9 @@
 import { ref, set, get, onValue, push, child } from 'firebase/database';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updatePassword, sendPasswordResetEmail } from "firebase/auth";
 import { db, auth } from '../util/firebase';
 
 
-//for changing categories and groups names to their ids (also used in other parts of code)
+//for changing categories and groups names to their ids (also used in other components)
 export function camelize(str) {
     return str
         .split(' ')
@@ -30,14 +30,11 @@ export function writeNewUserData(userData, password, setError, clearForm) {
         .catch((error) => {
             if (error.code === 'auth/email-already-in-use') {
                 setError('E-mail already in use')
-            }
-            else if (error.code === 'auth/weak-password') {
+            } else if (error.code === 'auth/weak-password') {
                 setError('Password must be at least 6 characters long')
-            }
-            else if (error.code === 'auth/invalid-email') {
+            } else if (error.code === 'auth/invalid-email') {
                 setError('Inavlid e-mail address')
-            }
-            else {
+            } else {
                 setError('Authentication error. Try again later. ');
             }
             return error;
@@ -48,19 +45,16 @@ export function writeNewUserData(userData, password, setError, clearForm) {
 export function signUserIn(email, password, setError) {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            localStorage.setItem('iticketsUid', userCredential.user.uid);
+            //localStorage.setItem('iticketsUid', userCredential.user.uid);
         })
         .catch((error) => {
             if (error.code === 'auth/invalid-email') {
                 setError('Invalid e-mail address')
-            }
-            else if (error.code === 'auth/user-not-found') {
+            } else if (error.code === 'auth/user-not-found') {
                 setError('User not found')
-            }
-            else if (error.code === 'auth/wrong-password') {
+            } else if (error.code === 'auth/wrong-password') {
                 setError('Wrong password')
-            }
-            else {
+            } else {
                 setError("Authentication error");
             }
         });
@@ -69,13 +63,34 @@ export function signUserIn(email, password, setError) {
 
 export function updateUserPassword(newPassword, setError, setShowAlert) {
     const user = auth.currentUser;
-    updatePassword(user, newPassword).then(() => {
-        setShowAlert(true);
-    }).catch((error) => {
-        setError(error);
-        setShowAlert(true);
-    });
+    updatePassword(user, newPassword)
+        .then(() => {
+            setShowAlert(true);
+        })
+        .catch((error) => {
+            setError(error);
+            setShowAlert(true);
+        });
 };
+
+export const resetPasswordViaEmail = (email, setError, setShowAlert) => {
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            setShowAlert(true);
+        })
+        .catch((error) => {
+            setError(error);
+            setShowAlert(true);
+        })
+};
+
+export function readGroupRole(group, setRole) {
+    const groupRef = ref(db, '/groups/' + camelize(group));
+    onValue(groupRef, (snapshot) => {
+        const group = snapshot.val();
+        setRole(group.role);
+    });
+}
 
 
 export function signUserOut() {
@@ -120,31 +135,20 @@ export function updateUserData(userData) {
 // ------------  TASKS DATA --------------
 
 
-export function readNewTaskId(setNewTaskId) {
-    const tasksRef = ref(db, 'tasks');
-    return onValue(tasksRef, (snapshot) => {
-        if (!snapshot.val()) {
-            setNewTaskId('T1');
-            return;
-        }
-        const newTaskId = Object.keys(snapshot.val()).length + 1;
-        setNewTaskId('T' + newTaskId);
+export function writeNewTaskData(taskData, setNewTaskId) {
+    const ID_PREFIX = 'T';
+    const currentTaskIdRef = ref(db, 'config/currentTaskId');
+    get(currentTaskIdRef).then((snapshot) => {
+        const currentId = snapshot.val() || 1;
+        const nextId = currentId + 1;
+        const nextTaskId = `${ID_PREFIX}${nextId}`
+        const newTaskRef = ref(db, '/tasks/' + nextTaskId);
+        set(newTaskRef, { ...taskData, id: nextTaskId });
+        set(currentTaskIdRef, nextId) // setting /config/nextTaskId without prefix
+        writeNewCategoryMember(taskData.category, nextTaskId);
+        setNewTaskId(nextTaskId);
     });
 };
-
-
-export function writeNewTaskData(taskData) {
-    const newTaskRef = ref(db, '/tasks/' + taskData.id);
-    writeNewCategoryMember(taskData.category, taskData.id);
-    set(newTaskRef, taskData);
-};
-
-
-export function updateSingleTaskData(taskData) {
-    const newTaskRef = ref(db, '/tasks/' + taskData.id);
-    set(newTaskRef, taskData)
-};
-
 
 export function readAllTasksData(updateTasks) {
     const tasksRef = ref(db, 'tasks');
@@ -158,15 +162,54 @@ export function readAllTasksData(updateTasks) {
     });
 };
 
+export function updateSingleTaskData(taskData) {
+    const newTaskRef = ref(db, '/tasks/' + taskData.id);
+    set(newTaskRef, taskData)
+};
 
 export function readSingleTaskData(taskId, updateTask) {
     const taskRef = ref(db, '/tasks/' + taskId);
     onValue(taskRef, (snapshot) => {
-        const taskData = snapshot.val();
-        updateTask(taskData);
+        if (snapshot.exists()) {
+            updateTask(snapshot.val());
+        } else {
+            const archiveTaskRef = ref(db, '/archive/' + taskId);
+            onValue(archiveTaskRef, (snapshot) => {
+                updateTask(snapshot.val());
+            })
+        }
+
     });
 };
 
+
+export function archiveTasks(archiveThresholdInDays) {
+    const cutoff = Date.now() - archiveThresholdInDays * 24 * 60 * 60 * 1000; // days converted to miliseconds
+    get(ref(db, 'tasks')).then(snapshot => {
+        snapshot.forEach(childSnapshot => {
+            const childData = childSnapshot.val();
+            const taskDate = new Date(childData.modificationDate);
+            if (taskDate.getTime() < cutoff) {
+                const taskRef = ref(db, 'tasks/' + childData.id);
+                const archivedTaskRef = ref(db, 'archive/' + childData.id);
+                set(archivedTaskRef, childData);
+                set(taskRef, null)
+            }
+        });
+    })
+};
+
+export function readArchivedTasks(updateTasks) {
+    const tasksRef = ref(db, 'archive');
+    return onValue(tasksRef, (snapshot) => {
+        const fetchedTasks = snapshot.val();
+        const transformedTasks = [];
+        for (const taskKey in fetchedTasks) {
+            transformedTasks.push(fetchedTasks[taskKey])
+        }
+        updateTasks(transformedTasks);
+    });
+};
 
 
 // ------------  RESPONSES DATA -------------- 
@@ -204,16 +247,18 @@ export function deleteResponse(taskId, responseKey) {
 
 export function writeNewGroupData(groupData, setError, clearForm) {
     const newGroupRef = ref(db, '/groups/' + groupData.id);
-    get(newGroupRef).then(snapshot => {
-        if (snapshot.exists()) {
-            throw new Error(`Group ${groupData.name} already exists`);
-        } else {
-            set(newGroupRef, groupData)
-            clearForm('')
-        }
-    }).catch(err => {
-        setError(err.message)
-    })
+    get(newGroupRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                throw new Error(`Group ${groupData.name} already exists`);
+            } else {
+                set(newGroupRef, groupData)
+                clearForm('')
+            }
+        })
+        .catch(err => {
+            setError(err.message)
+        })
 };
 
 
@@ -265,6 +310,21 @@ export function readGroupMembers(groupName, setMembers) {
     });
 };
 
+export function writeDefaultAssignedGroup(groupData) {
+    const defaultGroupSettingRef = ref(db, '/config/defaultGroup/');
+    set(defaultGroupSettingRef, groupData);
+};
+
+export function readDefaultAssignedGroup(setGroupFunc) {
+    const defaultGroupSettingRef = ref(db, '/config/defaultGroup/');
+    onValue(defaultGroupSettingRef, (snapshot) => {
+        if (!snapshot.val()) {
+            setGroupFunc('');
+        } else {
+            setGroupFunc(snapshot.val())
+        }
+    });
+};
 
 
 // ------------  CATEGORIES DATA -------------- 
@@ -272,16 +332,18 @@ export function readGroupMembers(groupName, setMembers) {
 
 export function writeCategoryData(category, setError, clearForm) {
     const newCategoryRef = ref(db, '/categories/' + category.id);
-    get(newCategoryRef).then(snapshot => {
-        if (snapshot.exists()) {
-            throw new Error(`Category ${category.name} already exists`)
-        } else {
-            set(newCategoryRef, category)
-            clearForm('')
-        }
-    }).catch(err => {
-        setError(err.message)
-    })
+    get(newCategoryRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                throw new Error(`Category ${category.name} already exists`)
+            } else {
+                set(newCategoryRef, category)
+                clearForm('')
+            }
+        })
+        .catch(err => {
+            setError(err.message)
+        })
 };
 
 
