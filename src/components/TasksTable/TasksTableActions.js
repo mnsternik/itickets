@@ -6,6 +6,29 @@ import { Box } from '@mui/material';
 import SelectInput from '../../UI/SelectInput';
 
 
+export function sortTasks(tasks, sortingOrder, sortingItem) {
+    const sortedTasks = [...tasks];
+    const sortingKey = camelize(sortingItem);
+    const sortingKeyDataType = typeof tasks[0][sortingKey];
+
+    if (sortingKeyDataType === 'string') {
+        sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
+    } else if (sortingKeyDataType === 'number') {
+        sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
+    } else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
+        sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
+    }
+    return sortingOrder === 'Ascending' ?
+        sortedTasks : sortedTasks.reverse()
+};
+
+export function filterTasks(tasks, viewFilter, filteredProperty, status) {
+    return tasks
+        .filter(task => task[filteredProperty] === viewFilter)
+        .filter(task => task.status === status);
+};
+
+
 const TasksTableActions = (props) => {
 
     const { viewType, tableData, updateTableData } = props;
@@ -36,7 +59,7 @@ const TasksTableActions = (props) => {
         viewfilteredProperty: filteredProp
     } = actionsFormState;
 
-    // settings view filter attribtiues based on table's view type
+    // setting view filter attribtiues based on table's view type
     useEffect(() => {
         if (viewType === '/group-tasks') {
             readAllGroupsData((groups) => dispatchActionsForm({
@@ -63,6 +86,8 @@ const TasksTableActions = (props) => {
     }, [loggedUserData.group, loggedUserData.uid, viewType])
 
     // filtering data depending on view filter and status, and then dispatching new tasks list to parent component (and selected status)
+
+
     useEffect(() => {
         let transformedTasks = [...tableData.tasks];
         if (filterValue && status && transformedTasks.length) {
@@ -85,27 +110,6 @@ const TasksTableActions = (props) => {
         updateTableData,
     ])
 
-    function sortTasks(tasks, sortingOrder, sortingItem) {
-        const sortedTasks = [...tasks];
-        const sortingKey = camelize(sortingItem);
-        const sortingKeyDataType = typeof tasks[0][sortingKey];
-
-        if (sortingKeyDataType === 'string') {
-            sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
-        } else if (sortingKeyDataType === 'number') {
-            sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
-        } else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
-            sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
-        }
-        return sortingOrder === 'Ascending' ?
-            sortedTasks : sortedTasks.reverse()
-    };
-
-    function filterTasks(tasks, viewFilter, filteredProperty, status) {
-        return tasks
-            .filter(task => task[filteredProperty] === viewFilter)
-            .filter(task => task.status === status);
-    };
 
     return (
         <Box sx={{
