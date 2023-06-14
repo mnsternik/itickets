@@ -19,7 +19,7 @@ const Sidebar = () => {
 
   const [showSidebar, setShowSidebar] = useState(true);
 
-  const userGroup = useSelector(state => state.auth.userData.group);
+  const userRole = useSelector(state => state.auth.userData.role);
 
   const tablesLinksData = [
     { text: 'Assigned to user', path: '/user-tasks', icon: <PersonIcon color='primary' /> },
@@ -74,7 +74,7 @@ const Sidebar = () => {
         <SidebarSection title={'Tasks'} listItems={tablesLinksData} />
         <SidebarSection title={'Actions'} listItems={actionsLinksData} />
         <SidebarSection title={'Settings'} listItems={accountLinksData} />
-        {userGroup === 'Helpdesk' && <SidebarSection title={'Administration'} listItems={administrationLinksData} />}
+        {userRole === 'admin' && <SidebarSection title={'Administration'} listItems={administrationLinksData} />}
 
       </Box>
 
