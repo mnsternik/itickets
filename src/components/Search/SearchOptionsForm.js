@@ -1,9 +1,9 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import { useSelector } from "react-redux";
 
 import SelectInput from "../../UI/SelectInput";
 
-import { TextField, Stack, Button } from "@mui/material";
+import { TextField, Stack, Button, FormControl, FormLabel, FormControlLabel, Switch } from "@mui/material";
 
 const initSearchOptions = {
     currentUserId: '',
@@ -18,20 +18,26 @@ const initSearchOptions = {
 
 const SearchOptionsForm = (props) => {
 
+    const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
+    const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(status => status.name);;
+
     const groupsSelectOptions = props.groups.map(group => group.name);
     const usersSelectOptions = props.users.map(user => ({ name: user.name, value: user.uid }));
     const categoriesSelectOptions = props.categories.map(category => category.name);
-    const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
-    const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(status => status.name);;
+
+    const [isSearchingArchive, setIsSearchingArchive] = useState(false);
 
     const [searchOptionsState, dispatchSearchOptions] = useReducer((state, action) => {
         return { ...state, ...action }
     }, initSearchOptions)
 
+    const fieldsetChangeHandler = () => {
+        setIsSearchingArchive(isSearching => !isSearching);
+    };
+
     const submitHandler = (e) => {
         e.preventDefault();
-
-        props.onSearchSubmit(searchOptionsState);
+        props.onSearchSubmit(searchOptionsState, isSearchingArchive);
     };
 
     return (
@@ -110,7 +116,7 @@ const SearchOptionsForm = (props) => {
                 />
             </Stack>
 
-            <Stack direction='row' spacing={1}>
+            <Stack direction='row' spacing={2}>
                 <Button
                     type='submit'
                     size='large'
@@ -128,6 +134,21 @@ const SearchOptionsForm = (props) => {
                 >
                     Clear
                 </Button>
+
+                <FormControl
+                    component="fieldset"
+                    variant="standard"
+                >
+                    <FormLabel component="legend">
+                        {isSearchingArchive ? 'Archive' : 'Main'}
+                    </FormLabel>
+                    <FormControlLabel
+                        label="Searched database"
+                        control={
+                            <Switch checked={isSearchingArchive} onChange={fieldsetChangeHandler} name="archive" />
+                        }
+                    />
+                </FormControl>
             </Stack>
 
         </Stack>
