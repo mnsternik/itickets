@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { readAllTasksData, readAllUsersData, readUserData } from '../lib/api';
 
-import TasksTable from './../components/TasksTable/TasksTable';
-import TasksTableActions from './../components/TasksTable/TasksTableActions';
+import TasksTable from '../components/TasksTable/TasksTable';
+import TasksTableActions from '../components/TasksTable/TasksTableActions';
 
 const UserCreatedTasks = () => {
 

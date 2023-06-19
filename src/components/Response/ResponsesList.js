@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { readResponseData, deleteResponse } from '../../lib/api';
+
 import Response from "./Response"
+
 import { Stack, Button } from "@mui/material"
 
 
 const ResponsesList = (props) => {
 
+    const { taskData } = props;
+
     const params = useParams();
     const { taskId } = params;
-
-    const { taskData } = props;
 
     const [responses, setResponses] = useState([]);
     const [showResponsesList, setShowResponsesList] = useState(false);
@@ -24,12 +26,14 @@ const ResponsesList = (props) => {
         if (responses.length === 1) {
             setShowResponsesList(false);
         }
+
         deleteResponse(taskId, responseKey);
     };
 
     const toggleResponsesList = () => {
         setShowResponsesList(prevState => !prevState)
     };
+
 
     let responsesList;
     if (responses.length) {
@@ -53,8 +57,8 @@ const ResponsesList = (props) => {
         <Stack spacing={3}>
 
             <Button
-                onClick={toggleResponsesList}
                 disabled={!responses.length}
+                onClick={toggleResponsesList}
             >
                 {showResponsesList ? 'Hide responses' : `Show responses (${responses.length})`}
             </Button>

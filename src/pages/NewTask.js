@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { readCategoriesData, readNewTaskId, writeNewTaskData } from '../lib/api';
+import { readCategoriesData, readDefaultAssignedGroup, writeNewTaskData } from '../lib/api';
 
 import NewTaskForm from '../components/NewTask/NewTaskForm';
 
@@ -13,16 +13,16 @@ const NewTask = () => {
     const userData = useSelector(state => state.auth.userData);
 
     const [newTaskId, setNewTaskId] = useState('');
+    const [defaultAssignedGroup, setDefaultAssignedGroup] = useState({})
     const [categories, setCategories] = useState([]);
-
-    const [alertData, setAlertData] = useState({ showAlert: false, taskId: '' });
+    const [showAlert, setShowAlert] = useState(false);
 
     const categoriesNamesArray = categories ?
         categories.map(category => category.name) : [];
 
     useEffect(() => {
-        readNewTaskId(setNewTaskId);
         readCategoriesData(setCategories);
+        readDefaultAssignedGroup(setDefaultAssignedGroup);
     }, [])
 
     const dateFormatter = new Intl.DateTimeFormat('en', {
@@ -33,14 +33,9 @@ const NewTask = () => {
         minute: 'numeric'
     });
 
-    const closeAlertHandler = () => {
-        setAlertData({ showAlert: false, taskId: '' });
-    }
-
     const addNewTaskHandler = (formData) => {
         const newTask = {
             ...formData,
-            id: newTaskId,
             createDate: dateFormatter.format(new Date()),
             modificationDate: dateFormatter.format(new Date()),
             authorId: userData.uid,
@@ -48,11 +43,11 @@ const NewTask = () => {
             status: 'Open',
             currentUserId: null,
             currentUser: null,
-            currentGroup: 'Helpdesk',
+            currentGroup: defaultAssignedGroup.name
         };
 
-        writeNewTaskData(newTask);
-        setAlertData({ showAlert: true, taskId: newTaskId });
+        writeNewTaskData(newTask, setNewTaskId);
+        setShowAlert(true);
     };
 
 
@@ -70,12 +65,12 @@ const NewTask = () => {
                 onAddNewTask={addNewTaskHandler}
             />
 
-            {alertData.showAlert &&
+            {showAlert &&
                 <Alert severity="success"
-                    onClose={closeAlertHandler}
+                    onClose={() => setShowAlert(false)}
                     sx={{ mt: 2 }}
                 >
-                    Task successfuly created. You can see it <Link style={{ color: 'green' }} to={`/tasks/${alertData.taskId}`}>here</Link>
+                    Task successfuly created. You can see it <Link style={{ color: 'green' }} to={`/tasks/${newTaskId}`}>here</Link>
                 </Alert>}
 
         </Paper>

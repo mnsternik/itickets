@@ -25,36 +25,13 @@ const TasksTable = (props) => {
     const {
         tasks,
         labels,
-        sortingOrder,
-        sortingItem,
         error,
         noTasksMessage
     } = props;
 
     const navigate = useNavigate();
 
-    const priorities = useSelector(state => state.tasks.priorities)
-
-
-    let sortedTasks = [];
-    const sortTasks = (tasks, sortingOrder, sortingItem) => {
-        const sortedTasks = [...tasks];
-        const sortingKey = camelize(sortingItem);
-        const sortingKeyDataType = typeof tasks[0][sortingKey];
-
-        if (sortingKeyDataType === 'string') {
-            sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
-        }
-        else if (sortingKeyDataType === 'number') {
-            sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
-        }
-        else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
-            sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
-        }
-
-        return sortingOrder === 'Ascending' ?
-            sortedTasks : sortedTasks.reverse()
-    };
+    const priorities = useSelector(state => state.tasks.priorities);
 
     const getPriorityByValue = (priorityValue) => {
         const priority = priorities.find(p => p.value === priorityValue);
@@ -66,38 +43,30 @@ const TasksTable = (props) => {
     };
 
     let message;
+    let tableContent;
     if (error) {
-        message = 'Failed to fetched content.';
-    }
-    else if (!tasks.length && !error) {
-        message = noTasksMessage
-    } else if (sortingItem && sortingOrder) {
-        sortedTasks = sortTasks(tasks, sortingOrder, sortingItem);
+        message = 'Failed to fetched content';
+    } else if (!tasks.length && !error) {
+        message = noTasksMessage || 'No results'
     } else {
-        sortedTasks = tasks;
+        tableContent = tasks.map((task) => (
+            <StyledTableRow
+                key={task.id}
+                onClick={() => rowClickHandler(task.id)}
+                sx={{ textDecoration: 'none', cursor: 'pointer' }}
+            >
+                {labels.map(label => (
+                    <StyledTableCell align={'center'} key={label + 'Cell'}>
+                        {label === 'Priority' ? getPriorityByValue(task[camelize(label)]) : task[camelize(label)]}
+                    </StyledTableCell>
+                ))}
+            </StyledTableRow>
+        ));
     }
-
-    const tableContent = sortedTasks.map((task) => (
-        <StyledTableRow
-            key={task.id}
-            onClick={() => rowClickHandler(task.id)}
-            sx={{ textDecoration: 'none', cursor: 'pointer' }}
-        >
-            {labels.map(label => (
-                <StyledTableCell
-                    align={'center'}
-                    key={label + 'Cell'}
-                >
-                    {label === 'Priority' ? getPriorityByValue(task[camelize(label)]) : task[camelize(label)]}
-                </StyledTableCell>
-            ))}
-        </StyledTableRow>
-    ));
 
     const tableHead = labels.map((label) => (
         <StyledTableCell align="center" key={label}> {label} </StyledTableCell>
     ));
-
 
     return (
         <>
@@ -114,9 +83,9 @@ const TasksTable = (props) => {
                 </Table>
             </TableContainer>
 
-            <Typography variant='subtitle2' sx={{ textAlign: 'center', mt: 2 }}>
+            {!tableContent && <Typography variant='subtitle2' sx={{ textAlign: 'center', mt: 2 }}>
                 {message}
-            </Typography>
+            </Typography>}
         </>
     );
 };

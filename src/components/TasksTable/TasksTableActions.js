@@ -1,39 +1,115 @@
-import Box from '@mui/material/Box';
+import { useEffect, useReducer } from 'react';
+import { useSelector } from 'react-redux';
+import { camelize, readAllGroupsData, readAllUsersData } from '../../lib/api';
+
+import { Box } from '@mui/material';
 import SelectInput from '../../UI/SelectInput';
+
+
+export function sortTasks(tasks, sortingOrder, sortingItem) {
+    const sortedTasks = [...tasks];
+    const sortingKey = camelize(sortingItem);
+    const sortingKeyDataType = typeof tasks[0][sortingKey];
+
+    if (sortingKeyDataType === 'string') {
+        sortedTasks.sort((taskA, taskB) => taskA[sortingKey].localeCompare(taskB[sortingKey]));
+    } else if (sortingKeyDataType === 'number') {
+        sortedTasks.sort((taskA, taskB) => taskA[sortingKey] - taskB[sortingKey])
+    } else if (sortingItem === 'Modification date' || sortingItem === 'Create date') {
+        sortedTasks.sort((taskA, taskB) => Date.parse(taskA[sortingKey]) - Date.parse(taskB[sortingKey]))
+    }
+    return sortingOrder === 'Ascending' ?
+        sortedTasks : sortedTasks.reverse()
+};
+
+export function filterTasks(tasks, viewFilter, filteredProperty, status) {
+    return tasks
+        .filter(task => task[filteredProperty] === viewFilter)
+        .filter(task => task.status === status);
+};
+
 
 const TasksTableActions = (props) => {
 
-    const sortingItemChangeHandler = (event) => {
-        props.onSortingItemChange(event.target.value)
+    const { viewType, tableData, updateTableData } = props;
+
+    const loggedUserData = useSelector(state => state.auth.userData);
+    const statusesOptions = useSelector(state => state.tasks.statuses);
+
+    const initActionsFormState = {
+        sortingItem: 'Priority',
+        sortingOrder: 'Descending',
+        status: 'In progress',
+        viewFilterVal: '',
+        viewFilterOptions: [],
+        viewFilterLabel: '',
+        viewFilteredProperty: ''
     };
 
-    const sortingOrderChangeHandler = (event) => {
-        props.onSortingOrderChange(event.target.value)
-    };
+    const [actionsFormState, dispatchActionsForm] = useReducer((state, action) => {
+        return { ...state, ...action }
+    }, initActionsFormState);
 
-    const filterItemChangeHandler = (event) => {
-        const newFilter = props.filterOptions.find(item => item.value === event.target.value);
-        props.onFilterItemChange(newFilter);
-    };
+    // destructuring state for better useEffect readability
+    const {
+        sortingItem,
+        sortingOrder,
+        status,
+        viewFilterVal: filterValue,
+        viewfilteredProperty: filteredProp
+    } = actionsFormState;
 
-    const statusFilterChangeHandler = (event) => {
-        const newStatus = props.statuses.find(item => item.value === event.target.value);
-        props.onStatusFilterChange(newStatus);
-    };
+    // setting view filter attribtiues based on table's view type
+    useEffect(() => {
+        if (viewType === '/group-tasks') {
+            readAllGroupsData((groups) => dispatchActionsForm({
+                viewFilterVal: loggedUserData.group,
+                viewFilterOptions: groups.map(group => ({ name: group.name, value: group.name })),
+                viewFilterLabel: 'Assigned to group',
+                viewfilteredProperty: 'currentGroup'
+            }))
+        } else if (viewType === '/user-created-tasks') {
+            readAllUsersData((users) => dispatchActionsForm({
+                viewFilterVal: loggedUserData.uid,
+                viewFilterOptions: users.map(user => ({ name: user.name, value: user.uid })),
+                viewFilterLabel: 'Created by user',
+                viewfilteredProperty: 'authorId'
+            }))
+        } else {
+            readAllUsersData((users) => dispatchActionsForm({
+                viewFilterVal: loggedUserData.uid,
+                viewFilterOptions: users.map(user => ({ name: user.name, value: user.uid })),
+                viewFilterLabel: 'Assigned to user',
+                viewfilteredProperty: 'currentUserId'
+            }))
+        }
+    }, [loggedUserData.group, loggedUserData.uid, viewType])
 
-    let filterSelectInput;
-    if (props.filterOptions.length) {
-        filterSelectInput = (
-            <SelectInput
-                label={props.filterLabel}
-                structure='objects'
-                options={props.filterOptions}
-                value={props.filterItem.value}
-                name={props.filterItem.name}
-                onChange={filterItemChangeHandler}
-            />
-        )
-    }
+    // filtering data depending on view filter and status, and then dispatching new tasks list to parent component (and selected status)
+
+
+    useEffect(() => {
+        let transformedTasks = [...tableData.tasks];
+        if (filterValue && status && transformedTasks.length) {
+            transformedTasks = filterTasks(transformedTasks, filterValue, filteredProp, status);
+        }
+        if (sortingOrder && sortingItem && transformedTasks.length) {
+            transformedTasks = sortTasks(transformedTasks, sortingOrder, sortingItem);
+        }
+        updateTableData({
+            displayedTasks: transformedTasks,
+            selectedStatus: status
+        })
+    }, [
+        sortingItem,
+        sortingOrder,
+        status,
+        filterValue,
+        filteredProp,
+        tableData.tasks,
+        updateTableData,
+    ])
+
 
     return (
         <Box sx={{
@@ -45,33 +121,37 @@ const TasksTableActions = (props) => {
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <SelectInput
                     label='Sort by'
-                    options={props.labels}
-                    value={props.sortingItem}
-                    onChange={sortingItemChangeHandler}
+                    options={['Priority', 'Create date', 'Modification date', 'Author', 'Category']}
+                    value={actionsFormState.sortingItem}
+                    onChange={(e) => dispatchActionsForm({ sortingItem: e.target.value })}
                     sx={{ mr: 1 }}
                 />
 
                 <SelectInput
                     label='Order'
                     options={['Ascending', 'Descending']}
-                    value={props.sortingOrder}
-                    onChange={sortingOrderChangeHandler}
+                    value={actionsFormState.sortingOrder}
+                    onChange={(e) => dispatchActionsForm({ sortingOrder: e.target.value })}
                 />
             </Box>
 
             <Box>
                 <SelectInput
                     label='Status'
-                    structure='objects'
-                    options={props.statuses}
-                    value={props.statusFilter.value}
-                    onChange={statusFilterChangeHandler}
+                    options={statusesOptions}
+                    value={actionsFormState.status}
+                    onChange={(e) => dispatchActionsForm({ status: e.target.value })}
                     sx={{ mr: 1 }}
                 />
 
-                {!props.hideFilter && filterSelectInput}
+                <SelectInput
+                    structure='objects'
+                    label={actionsFormState.viewFilterLabel}
+                    options={actionsFormState.viewFilterOptions}
+                    value={actionsFormState.viewFilterVal}
+                    onChange={(e) => dispatchActionsForm({ viewFilterVal: e.target.value })}
+                />
             </Box>
-
         </Box>
     )
 };

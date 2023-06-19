@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSelector, } from 'react-redux';
-import { readAllTasksData, readAllGroupsData, readUserData } from '../lib/api';
+import { readAllTasksData, readAllGroupsData } from '../lib/api';
 
-import TasksTable from './../components/TasksTable/TasksTable';
-import TasksTableActions from './../components/TasksTable/TasksTableActions';
+import TasksTable from '../components/TasksTable/TasksTable';
+import TasksTableActions from '../components/TasksTable/TasksTableActions';
 
 const GroupTasks = () => {
 
-    const token = useSelector(state => state.auth.token);
+    const userData = useSelector(state => state.auth.userData);
 
-    const [userData, setUserData] = useState({ name: '', group: '' });
     const [filterItem, setFilterItem] = useState({ name: userData.group, value: userData.group });
     const [allGroups, setAllGroups] = useState([]);
 
@@ -31,8 +30,7 @@ const GroupTasks = () => {
     useEffect(() => {
         readAllTasksData(setTasks);
         readAllGroupsData(setAllGroups);
-        readUserData(token, setUserData);
-    }, [token])
+    }, [])
 
     useEffect(() => {
         setFilterItem({ name: userData.group, value: userData.group });
