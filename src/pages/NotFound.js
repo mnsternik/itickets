@@ -6,7 +6,6 @@ const NotFound = () => {
         <Paper sx={{ p: 2, m: 4 }}>
             <Typography variant='h5'>
                 Page not found
-
             </Typography>
         </Paper>
     )
