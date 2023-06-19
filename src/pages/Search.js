@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { readAllGroupsData, readAllTasksData, readAllUsersData, readCategoriesData } from '../lib/api';
+import { readAllGroupsData, readAllTasksData, readAllUsersData, readCategoriesData, readArchivedTasks } from '../lib/api';
 
 import SearchOptionsForm from '../components/Search/SearchOptionsForm';
 
@@ -13,6 +13,7 @@ const Search = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [categories, setCategories] = useState([]);
     const [allTasks, setAllTasks] = useState([]);
+    const [archivedTasks, setArchivedTasks] = useState([]);
     const [filteredTasks, setFilteredTasks] = useState([]);
 
     const labels = ['ID', 'Title', 'Priority', 'Category', 'Status', 'Current group', 'Modification date'];
@@ -22,39 +23,39 @@ const Search = () => {
         readAllUsersData(setAllUsers);
         readCategoriesData(setCategories);
         readAllTasksData(setAllTasks);
+        readArchivedTasks(setArchivedTasks);
     }, []);
-
 
     const searchWordsInString = (wordsStr, string) => {
         const wordsArr = wordsStr.toLowerCase().split(' ');
         const str = string.toLowerCase();
-
         let score = 0;
         wordsArr.forEach(word => {
             if (str.includes(word)) {
                 score++
             }
         })
-
         // all searched words must be included in result 
         if (score === wordsArr.length) {
             return true;
         }
-
         return false;
     };
 
 
-    const searchTasksWithParams = (searchParams) => {
-        let tasks = structuredClone(allTasks);
+    const searchTasksWithParams = (searchParams, isSearchingArchive) => {
+        let tasks;
+        if (isSearchingArchive) {
+            tasks = structuredClone(archivedTasks)
+        } else {
+            tasks = structuredClone(allTasks);
+        }
         const searchParamsKeys = [];
-
         for (let key in searchParams) {
             if (searchParams[key] !== '') {
                 searchParamsKeys.push(key)
             }
         }
-
         searchParamsKeys.forEach(key => {
             tasks = tasks.filter(task => {
                 if (key === 'title' || key === 'description') {
@@ -63,10 +64,8 @@ const Search = () => {
                 return searchParams[key] === task[key]
             })
         })
-
         setFilteredTasks(tasks);
     };
-
 
     return (
         <Stack spacing={3}>
@@ -76,13 +75,11 @@ const Search = () => {
                 categories={categories}
                 onSearchSubmit={searchTasksWithParams}
             />
-
             <TasksTable
                 tasks={filteredTasks}
                 labels={labels}
                 noTasksMessage='Change search paramaters to see results'
             />
-
         </Stack>
     );
 };
