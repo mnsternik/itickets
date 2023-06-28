@@ -22,19 +22,18 @@ const GroupsList = (props) => {
 
             return (
                 <TableRow key={group.name}>
-
                     <TableCell component="th" scope="row">
                         {group.name}
                     </TableCell>
-
+                    <TableCell component="th" scope="row">
+                        {group.role}
+                    </TableCell>
                     <TableCell align="center">
                         {group.members ? groupMembersAmount : 0}
                     </TableCell>
-
                     <TableCell align="right">
                         {<Button onClick={() => deleteGroupHandler(group.id)}>Delete</Button>}
                     </TableCell>
-
                 </TableRow>
             )
         })
@@ -47,6 +46,7 @@ const GroupsList = (props) => {
                 <TableHead>
                     <TableRow >
                         <TableCell sx={{ color: 'text.secondary' }}>Name</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>Role</TableCell>
                         <TableCell sx={{ color: 'text.secondary' }} align="center">Members</TableCell>
                         <TableCell sx={{ color: 'text.secondary' }} align="right">Action</TableCell>
                     </TableRow>
