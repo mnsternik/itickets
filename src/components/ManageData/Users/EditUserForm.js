@@ -1,9 +1,9 @@
 import { useState, useReducer } from 'react';
-import { updateUserData } from '../../../lib/api';
+import { updateUserData, resetPasswordViaEmail } from '../../../lib/api';
 
 import SelectInput from '../../../UI/SelectInput';
 
-import { Stack, Typography, Button, TextField, Divider, Alert } from '@mui/material';
+import { Stack, Typography, Button, TextField, Divider, Alert, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const initUserState = {
@@ -56,6 +56,10 @@ const EditUserForm = (props) => {
             return false;
         }
         return true;
+    };
+
+    const sendPasswordResetEmailHandler = () => {
+        resetPasswordViaEmail(userState.email);
     };
 
     const submitHandler = (event) => {
@@ -117,6 +121,10 @@ const EditUserForm = (props) => {
                     onChange={e => dispatchFormData({ payload: { group: e.target.value } })}
                 />
 
+                <FormControl>
+                    <FormControlLabel control={<Checkbox defaultChecked />} label="Active" />
+                </FormControl>
+
 
                 <Stack direction="row" spacing={2}>
 
@@ -145,7 +153,7 @@ const EditUserForm = (props) => {
 
                 </Stack>
 
-                {userState.uid && <Button variant='outlined'>Send password reset email</Button>}
+                {userState.uid && <Button variant='outlined' onClick={sendPasswordResetEmailHandler}>Send password reset email</Button>}
 
                 {showAlert && <Alert severity={error ? 'error' : 'success'} onClose={() => setShowAlert(false)}>
                     {alertMessage}
