@@ -6,8 +6,6 @@ import { sortTasks } from "../../../components/TasksTable/TasksTableActions";
 
 import * as apiModule from '../../../lib/api';
 
-//import { debug } from 'jest-preview';
-
 import { mockGroups } from "../../mocks/groups";
 import { mockUsersList } from "../../mocks/users";
 import { mockTasks } from "../../mocks/tasks";
@@ -126,3 +124,4 @@ describe('sortTasks function', () => {
         expect(sortedTasks[2].modificationDate).toEqual('12/21/2022, 4:26 AM');
     });
 });
+
