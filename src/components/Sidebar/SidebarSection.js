@@ -10,6 +10,7 @@ const SidebarSection = (props) => {
             <ListItemButton
                 component={NavLink}
                 to={item.path}
+                end
                 style={(navData) => navData.isActive ? { backgroundColor: '#1976d2' } : {}}
             >
                 <ListItemIcon>
