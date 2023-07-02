@@ -16,7 +16,7 @@ const NewTaskForm = (props) => {
     const priorities = useSelector(state => state.tasks.priorities);
 
     const [taskState, dispatchTask] = useReducer((state, action) => {
-        const newTask = { ...state, ...action }
+        const newTask = { ...state, ...action.payload }
 
         if (action.type === 'priority_change') {
             newTask.priority = parseInt(newTask.priority)
@@ -36,13 +36,9 @@ const NewTaskForm = (props) => {
             setShowAlert(true);
             return;
         }
-
         setShowAlert(false);
-
         props.onAddNewTask(taskState);
-
-        // clear form 
-        dispatchTask(initTaskState);
+        dispatchTask({ payload: initTaskState });
     }
 
     return (
@@ -55,15 +51,15 @@ const NewTaskForm = (props) => {
             <TextField
                 label='Title'
                 value={taskState.title}
-                onChange={e => dispatchTask({ title: e.target.value })}
+                onChange={e => dispatchTask({ payload: { title: e.target.value } })}
             />
 
             <TextField
                 label="Description"
                 value={taskState.description}
                 multiline
-                rows="5"
-                onChange={e => dispatchTask({ description: e.target.value })}
+                rows="8"
+                onChange={e => dispatchTask({ payload: { description: e.target.value } })}
             />
 
             <Stack direction='row' spacing={2}>
@@ -74,7 +70,7 @@ const NewTaskForm = (props) => {
                     options={priorities}
                     inputProps={{ readOnly: props.isFormDisabled }}
                     sx={{ width: 180 }}
-                    onChange={e => dispatchTask({ type: 'priority_change', priority: e.target.value })}
+                    onChange={e => dispatchTask({ type: 'priority_change', payload: { priority: e.target.value } })}
                 />
 
                 <SelectInput
@@ -82,7 +78,7 @@ const NewTaskForm = (props) => {
                     value={taskState.category}
                     options={props.categories}
                     sx={{ width: 180 }}
-                    onChange={e => dispatchTask({ category: e.target.value })}
+                    onChange={e => dispatchTask({ payload: { category: e.target.value } })}
                 />
             </Stack>
 
