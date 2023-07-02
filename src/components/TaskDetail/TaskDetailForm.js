@@ -8,7 +8,7 @@ import SelectInput from "../../UI/SelectInput";
 const TaskDetailForm = (props) => {
 
     const prioritiesSelectOptions = useSelector(state => state.tasks.priorities);
-    const statusesSelectOptions = useSelector(state => state.tasks.statuses).map(s => s.name);
+    const statusesSelectOptions = useSelector(state => state.tasks.statuses);
 
     const groupsSelectOptions = props.groups.map(group => group.name)
     const categoriesSelectOptions = props.categories.map(category => category.name);
@@ -76,9 +76,8 @@ const TaskDetailForm = (props) => {
                     label='Status'
                     value={props.taskData.status}
                     options={statusesSelectOptions}
-                    inputProps={{ readOnly: props.isFormDisabled }}
-                    IconComponent={props.isFormDisabled ? '' : ArrowDropDownIcon}
-                    onChange={(e) => props.onSelectChange({ status: e.target.value })}
+                    inputProps={{ readOnly: true }}
+                    IconComponent={''}
                 />
 
                 <SelectInput
